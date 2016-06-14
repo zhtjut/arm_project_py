@@ -55,45 +55,6 @@ class Control:
     def get_irrigation(self):
         return self.__irrigation
 
-    def set_roof_vent_south(self, value):
-        self.__roof_vent_south = value
-
-    def set_roof_vent_north(self, value):
-        self.__roof_vent_north = value
-
-    def set_side_vent(self, value):
-        self.__side_vent = value
-
-    def set_shade_screen_out(self, value):
-        self.__shade_screen_out = value
-
-    def set_shade_screen_in(self, value):
-        self.__shade_screen_in = value
-
-    def set_thermal_screen(self, value):
-        self.__thermal_screen = value
-
-    def set_cooling_pad(self, value):
-        self.__cooling_pad = value
-
-    def set_fogging(self, value):
-        self.__fogging = value
-
-    def set_heating(self, value):
-        self.__heating = value
-
-    def set_co2(self, value):
-        self.__co2 = value
-
-    def set_lighting_1(self, value):
-        self.__lighting_1 = value
-
-    def set_lighting_2(self, value):
-        self.__lighting_2 = value
-
-    def set_irrigation(self, value):
-        self.__irrigation = value
-
     tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent", "shade_screen_out",
                             "shade_screen_in", "thermal_screen")
 
