@@ -56,14 +56,16 @@ def control():
             if key in Control.tri_states_actuators:
                 value = obj.get(key)
                 if value in Control.tri_states:
-                    print key, "turns", value  # relay
+                    setattr(c, "_Control__" + key, value)  # relay
+                    print key, getattr(c, "_Control__" + key)
                     json_response += '''"%s" : "%s",''' % (key, value)
                 else:
                     print value, "illegal state"
             elif key in Control.bi_states_actuators:
                 value = obj.get(key)
                 if value in Control.bi_states:
-                    print key, "turns", value  # relay
+                    setattr(c, "_Control__" + key, value)  # relay
+                    print key, getattr(c, "_Control__" + key)
                     json_response += '''"%s" : "%s",''' % (key, value)
                 else:
                     print value, "illegal state"
