@@ -1,3 +1,7 @@
+import json
+from currenttime import get_current_time
+
+
 class Control:
     '''the object of tri-state actuators and bi-state'''
 
@@ -55,8 +59,67 @@ class Control:
     def get_irrigation(self):
         return self.__irrigation
 
-    tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent", "shade_screen_out",
-                            "shade_screen_in", "thermal_screen")
+    def handle_post(self, data):
+        obj = json.loads(data)
+        keys = obj.keys()
+        json_response = "{"
+        for key in keys:
+            if key in Control.tri_states_actuators:
+                value = obj.get(key)
+                if value in Control.tri_states:
+                    setattr(self, "_Control__" + key, value)  # relay
+                    print key, getattr(self, "_Control__" + key)
+                    json_response += '''"%s" : "%s",''' % (key, value)
+                else:
+                    print value, "illegal state"
+            elif key in Control.bi_states_actuators:
+                value = obj.get(key)
+                if value in Control.bi_states:
+                    setattr(self, "_Control__" + key, value)  # relay
+                    print key, getattr(self, "_Control__" + key)
+                    json_response += '''"%s" : "%s", ''' % (key, value)
+                else:
+                    print value, "illegal state"
+            else:
+                print key, "illegal actuator"
+        json_response += '''"status" : "%s", ''' % "success"
+        json_response += '''"update_time" : "%s"''' % get_current_time()
+        json_response += "}"
+        return json_response
+
+    def build_json(self):
+        return '''
+        {
+            "actuator":{
+                "tri_state":{
+                    "roof_vent_south": "%s",
+                    "roof_vent_north": "%s",
+                    "side_vent": "%s",
+                    "shade_screen_out": "%s",
+                    "shade_screen_in": "%s",
+                    "thermal_screen": "%s"
+                },
+                "bi_state":{
+                    "cooling_pad": "%s",
+                    "fogging": "%s",
+                    "heating": "%s",
+                    "co2": "%s",
+                    "lighting_1": "%s",
+                    "lighting_2": "%s",
+                    "irrigation": "%s"
+                },
+                "update_time":"%s"
+            }
+
+        }''' \
+               % (self.get_roof_vent_south(), self.get_roof_vent_north(), self.get_side_vent(),
+                  self.get_shade_screen_out(), self.get_shade_screen_in(),
+                  self.get_thermal_screen(), self.get_cooling_pad(), self.get_fogging(), self.get_heating(),
+                  self.get_co2(), self.get_lighting_1(), self.get_lighting_2(), self.get_irrigation(),
+                  get_current_time())
+
+    tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent",
+                            "shade_screen_out", "shade_screen_in", "thermal_screen")
 
     bi_states_actuators = ("cooling_pad", "fogging", "heating", "co2", "lighting_1", "lighting_2", "irrigation")
 
