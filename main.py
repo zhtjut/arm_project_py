@@ -6,6 +6,7 @@ from outdoor import Outdoor
 from control import Control
 from indoor import Indoor
 from scheduler import Scheduler
+from database import save_db_indoor, save_db_outdoor, save_db_control
 
 app = Flask(__name__)
 
@@ -15,21 +16,24 @@ c = Control()
 
 
 def update_indoor():
+#     save_db_indoor(node0)
     print 'indoor updated', get_current_time()
 
 
 def update_outdoor():
     outdoor.get_weather_from_api()
+#     save_db_outdoor(outdoor)
     print 'outdoor updated', get_current_time()
 
 
 def update_control():
+#     save_db_control(c)
     print 'control updated', get_current_time()
 
 
-scheduler1 = Scheduler(5, update_outdoor)
-scheduler2 = Scheduler(300, update_indoor)
-scheduler3 = Scheduler(300, update_control())
+scheduler1 = Scheduler(2, update_outdoor)
+scheduler2 = Scheduler(3, update_indoor)
+scheduler3 = Scheduler(5, update_control)
 scheduler1.start()
 scheduler2.start()
 scheduler3.start()
