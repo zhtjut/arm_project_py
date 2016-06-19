@@ -6,7 +6,8 @@ from outdoor import Outdoor
 from control import Control
 from indoor import Indoor
 from scheduler import Scheduler
-from database import save_db_indoor, save_db_outdoor, save_db_control
+from parameter import Parameter
+from database import save_db_indoor, save_db_outdoor, save_db_control,get_db_parameter,save_db_parameter
 
 app = Flask(__name__)
 
@@ -30,10 +31,12 @@ def update_control():
 #     save_db_control(c)
     print 'control updated', get_current_time()
 
+def update_parameter():
+    get_db_parameter()
 
-scheduler1 = Scheduler(2, update_outdoor)
-scheduler2 = Scheduler(3, update_indoor)
-scheduler3 = Scheduler(5, update_control)
+scheduler1 = Scheduler(2000, update_outdoor)
+scheduler2 = Scheduler(3000, update_indoor)
+scheduler3 = Scheduler(5000, update_control)
 scheduler1.start()
 scheduler2.start()
 scheduler3.start()
@@ -64,6 +67,14 @@ def control():
             return "你追我，如果你追到我，我就让你你嘿嘿嘿！"
     else:
         return c.build_json()
+
+@app.route('/parameter',methods=['GET','POST'])
+def parameter():
+    if request.method == 'POST':
+        save_db_parameter(Parameter)
+        return 'save success'
+    else:
+        return 
 
 
 @app.route('/hi')

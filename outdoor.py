@@ -14,6 +14,7 @@ class Outdoor(object):
     wind_speed = "0"
     rain = "0"
     atmosphere = "0"
+    bad_weather="true"
 
     def set_outdoor(self, update_time1, temperature1, humidity1, radiation1, co21, wind_direction1, wind_speed1,
                     rain1, atmosphere1):

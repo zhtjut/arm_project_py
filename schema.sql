@@ -39,7 +39,8 @@ create table if not exists 'control_state'(
 	irrigation text not null
 );
 
---create table if not exists 'parameter'(
+--create table if not exists 'plant_parameter_setting'(
+--	id integer primary key autoincrement,
 --	time1 text not null,
 --    temperature1 text not null,
 --    time2 text not null,
@@ -49,36 +50,67 @@ create table if not exists 'control_state'(
 --    time4 text not null,
 --    temperature4 text not null,
 --    co2_upper_limit text not null,
---    co2_lower_limit text not null,
---    cooling_start_temperature text not null,
---    cooling_stop_temperature text not null,
---    excepte_humidity text not null,
---    humidity_influence_range text not null,
---    low_humidity_influence_on_temperature text not null,
---    high_humidity_influence_on_temperature text not null,
---    expect_light text not null,
---    light_influence_on_tempurature_slop text not null,
---    light_influence_on_temperature text not null,
---    frost_temperature text not null,
---    indoor_temperature_lower_limit text not null,
---    roof_vent_wind_speed_upper_limit text not null,
---    roof_vent_rain_upper_limit text not null,
---    hearting_start_lowest_temperature text not null,
---    hearting_stop_highest_temperature text not null,
---    open_month text not null,
---    stop_month text not null,
---    open_time text not null,
---    stop_time text not null,
---    open_temperature_setting text not null,
---    wait_time_to_open text not null,
---    rani_upper_limit_to_close text not null,
---    upper_limit_light_to_open_shade_screen_out text not null,
---    upper_limit_light_to_open_shade_screen_in text not null,
---    light_to_open_lighting text not null,
---    soil_humidity_to_start_irrigation text not null,
---    soil_humidity_to_stop_irrigation text not null,
---    temperature_to_open_fogging text not null,
---    light_start_time text not null,
---    light_stop_time text not null,
---    temperature_to_open_cooling_pad text not null
---)
+--    co2_lower_limit text not null
+--);
+--
+--create table if not exists 'co2_parameter_setting'(
+--	id integer primary key autoincrement,
+--	co2_upper_limit text not null,
+--    co2_lower_limit text not null
+--);
+
+create table if not exists 'parameter'(
+	id integer primary key autoincrement,
+	time1 text not null,
+    temperature1 text not null,
+    time2 text not null,
+    temperature2 text not null,
+    time3 text not null,
+    temperature3 text not null,
+    time4 text not null,
+    temperature4 text not null,
+    co2_upper_limit text not null,
+    co2_lower_limit text not null,
+    
+    cooling_start_temperature text not null,
+    cooling_stop_temperature text not null,
+    
+    expect_humidity text not null,
+    humidity_influence_range_of_air_temperature text not null,
+    low_humidity_influence_on_air_temperature text not null,
+    high_humidity_influence_on_air_temperature text not null,
+    expect_light text not null,
+    light_influence_on_air_temperature_slope text not null,
+    high_light_influence_on_temperature text not null,
+    low_light_influence_on_temperature text not null,
+    frost_temperature text not null,
+    indoor_temperature_lower_limit text not null,
+    roof_vent_wind_speed_upper_limit text not null,
+    roof_vent_rain_upper_limit text not null,
+    
+    heating_start_lowest_temperature text not null,
+    heating_stop_highest_temperature text not null,
+    
+    month_to_open_thermal_screen text not null,
+    month_to_close_thermal_screen text not null,
+    time_to_open_thermal_screen text not null,
+    time_to_close_thermal_screen text not null,
+    
+    temperature_to_open_side text not null,
+    wait_time_to_open_side text not null,
+    rain_upper_limit_to_close text not null,
+    
+    upper_limit_light_to_open_shade_screen_out text not null,
+    upper_limit_light_to_open_shade_screen_in text not null,
+    soil_humidity_to_start_irrigation text not null,
+    soil_humidity_to_stop_irrigation text not null,
+    temperature_to_open_fogging text not null,
+    temperature_to_open_cooling_pad text not null,
+    
+    month_to_open_lighting text not null,
+    month_to_close_lighting text not null,
+    time_to_close_lighting text not null,
+    time_to_close_lihting text not null,
+    radiatiopn_to_open_lighting text not null,
+    radiation_to_close_lihting text not null
+)
