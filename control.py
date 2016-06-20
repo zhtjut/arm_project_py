@@ -147,6 +147,7 @@ class Control(object):
     def build_json(self):
         return '''
         {
+            "update_time":"%s"
             "actuator":{
                 "tri_state":{
                     "roof_vent_south": "%s",
@@ -165,15 +166,15 @@ class Control(object):
                     "lighting_2": "%s",
                     "irrigation": "%s"
                 },
-                "update_time":"%s"
+                
             }
 
         }''' \
-               % (self.get_roof_vent_south(), self.get_roof_vent_north(), self.get_side_vent(),
+               % (get_current_time(),self.get_roof_vent_south(), self.get_roof_vent_north(), self.get_side_vent(),
                   self.get_shade_screen_out(), self.get_shade_screen_in(),
                   self.get_thermal_screen(), self.get_cooling_pad(), self.get_fogging(), self.get_heating(),
-                  self.get_co2(), self.get_lighting_1(), self.get_lighting_2(), self.get_irrigation(),
-                  get_current_time())
+                  self.get_co2(), self.get_lighting_1(), self.get_lighting_2(), self.get_irrigation()
+                  )
 
     tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent",
                             "shade_screen_out", "shade_screen_in", "thermal_screen")

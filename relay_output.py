@@ -89,10 +89,7 @@ third_8th=(third_8th_on,third_8th_off)
 third_relay=[third_1st,third_2nd,third_3rd,third_4th,third_5th,third_6th,third_7th,third_8th]
 
 
-Query_all="FE 01 00 00 00 08 29 C3"
-Query_all_return="FE 01 01 00 61 9C"
-
-post={"roof_vent_south":"on"}
+# post={"roof_vent_south":"on"}
 control_relay={
     "tri_state":{
                 "roof_vent_south":{
@@ -133,44 +130,41 @@ control_relay={
 
 def bi_state_relay(key,value):
     relay=control_relay.get("bi_state")
-    str=relay.get(key)
+    str1=relay.get(key)
     if value=="on":
-        out_str=str[0]
+        out_str=str1[0]
         print '\n%s relay01 on' %key
         println(out_str)
     else:
-        out_str=str[1]
+        out_str=str1[1]
         print '\n%s relay01 off' %key
         println(out_str)
 
 def tri_state_relay(key,value):
     relay=control_relay.get("tri_state")
-    str=relay.get(key)
+    str1=relay.get(key)
     if value=="on":
-        out_str=str.get("off")[1]
+        out_str=str1.get("off")[1]
         print '\n%s relay02 off' %key
         println(out_str)
-        out_str=str.get("on")[0]
+        out_str=str1.get("on")[0]
         print '%s relay01 on' %key
         println(out_str)
     elif value=="off":
-        out_str=str.get("on")[0]
+        out_str=str1.get("on")[0]
         print '\n%s relay02 on' %key
         println(out_str)
-        out_str=str.get("off")[1]
+        out_str=str1.get("off")[1]
         print '%s relay01 off' %key
         println(out_str)
     else:
-        out_str=str.get("off")[1]
+        out_str=str1.get("off")[1]
         print '\n%s relay01 off' %key
         println(out_str)
-        out_str=str.get("on")[1]
+        out_str=str1.get("on")[1]
         print '%s relay02 off' %key
         println(out_str)
 
-def get_all_state():
-    out_str=Query_all
-    println(out_str)
 
 #test
 # str="lighting_2"
