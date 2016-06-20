@@ -2,12 +2,10 @@
 
 @author: Zxh
 '''
-from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+from flask import Flask, g
 import sqlite3
 import os
 from currenttime import get_current_time
-from contextlib import closing
 from parameter import Parameter
 
 app=Flask(__name__)
@@ -72,12 +70,13 @@ def save_db_control(Control):
 def save_db_parameter(Parameter):
     with app.app_context():
         db=get_db()
-        db.execute('insert into parameter(time1,temperature1,time2,temperature2,time3,temperature3,time4,temperature4, co2_upper_limit,co2_lower_limit, cooling_start_temperature,cooling_stop_temperature,\
+        db.execute('insert into parameter(update_time,time1,temperature1,time2,temperature2,time3,temperature3,time4,temperature4, co2_upper_limit,co2_lower_limit, cooling_start_temperature,cooling_stop_temperature,\
                     expect_humidity,humidity_influence_range_of_air_temperature,low_humidity_influence_on_air_temperature,high_humidity_influence_on_air_temperature,expect_light,light_influence_on_air_temperature_slope,high_light_influence_on_temperature,low_light_influence_on_temperature,frost_temperature,\
                     indoor_temperature_lower_limit,roof_vent_wind_speed_upper_limit,roof_vent_rain_upper_limit, heating_start_lowest_temperature,heating_stop_highest_temperature, month_to_open_thermal_screen,month_to_close_thermal_screen,time_to_open_thermal_screen,time_to_close_thermal_screen, temperature_to_open_side,\
-                    wait_time_to_open_side,rani_upper_limit_to_close, upper_limit_light_to_open_shade_screen_out,upper_limit_light_to_open_shade_screen_in,soil_humidity_to_start_irrigation,soil_humidity_to_stop_irrigation,temperature_to_open_fogging,temperature_to_open_cooling_pad,\
-                    month_to_open_lighting,month_to_close_lighting,time_to_close_lighting,time_to_close_lihting,radiatiopn_to_open_lighting,radiation_to_close_lihting) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',\
-                    [Parameter.get_time_1(),Parameter.get_temperature_1(),Parameter.get_time_2(),Parameter.get_temperature_2(),Parameter.get_time_3(),Parameter.get_temperature_3(),Parameter.get_time_4(),Parameter.get_temperature_4(),Parameter.get_co2_upper_limit(),Parameter.get_co2_lower_limit(),
+                    wait_time_to_open_side,rain_upper_limit_to_close, upper_limit_light_to_open_shade_screen_out,upper_limit_light_to_open_shade_screen_in,soil_humidity_to_start_irrigation,soil_humidity_to_stop_irrigation,temperature_to_open_fogging,temperature_to_open_cooling_pad,\
+                    month_to_open_lighting,month_to_close_lighting,period1_start_lighting,period1_stop_lighting,period2_start_lighting,period2_stop_lighting,radiation1_to_open_lighting,radiation2_to_open_lighting,roof_vent_open_time,side_vent_open_time,shade_screen_out_open_time,\
+                    shade_screen_in_open_time,thermal_screen_open_time ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',\
+                    [get_current_time(),Parameter.get_time_1(),Parameter.get_temperature_1(),Parameter.get_time_2(),Parameter.get_temperature_2(),Parameter.get_time_3(),Parameter.get_temperature_3(),Parameter.get_time_4(),Parameter.get_temperature_4(),Parameter.get_co_2_upper_limit(),Parameter.get_co_2_lower_limit(),
                      Parameter.get_cooling_start_temperature(),Parameter.get_cooling_stop_temperature(),
                      Parameter.get_expect_humidity(),Parameter.get_humidity_influence_range_of_air_temperature(),Parameter.get_low_humidity_influence_on_air_temperature(),Parameter.get_high_humidity_influence_on_air_temperature(),Parameter.get_expect_light(),Parameter.get_light_influence_on_air_temperature_slope(),
                      Parameter.get_high_light_influence_on_temperature(),Parameter.get_low_light_influence_on_temperature(),Parameter.get_frost_temperature(),Parameter.get_indoor_temperature_lower_limit(),Parameter.get_roof_vent_wind_speed_upper_limit(),Parameter.get_roof_vent_rain_upper_limit(),
@@ -93,31 +92,110 @@ def save_db_parameter(Parameter):
                      Parameter.get_temperature_to_open_cooling_pad(),
                      Parameter.get_month_to_open_lighting(),
                      Parameter.get_month_to_close_lighting(),
-                     Parameter.get_time_to_close_lighting(),
-                     Parameter.get_time_to_close_lihting(),
-                     Parameter.get_radiatiopn_to_open_lighting(),
-                     Parameter.get_radiation_to_close_lihting()])
+                     Parameter.get_period_1_start_lighting(),
+                     Parameter.get_period_1_stop_lighting(),
+                     Parameter.get_period_2_start_lighting(),
+                     Parameter.get_period_2_stop_lighting(),
+                     Parameter.get_radiation_1_to_open_lighting(),
+                     Parameter.get_radiation_2_to_open_lighting(),
+                     Parameter.get_roof_vent_open_time(),
+                     Parameter.get_side_vent_time(),
+                     Parameter.get_shade_screen_out_time(),
+                     Parameter.get_shade_screen_in_time(),
+                     Parameter.get_thermal_screen_open_time()
+                     ])
         db.commit()
         print 'parameter save success'
-def get_db_parameter(Parameter):
-    conn=sqlite3.connect('greenhouse.db')
-    cursor=conn.execute('select * from parameter where id=(select max(id))')
-    for row in cursor:
-        pass
-    Parameter.set_parameter(Parameter,row[1], row[2], row[3], row[4], row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],
-                            row[15],row[16],row[17],row[18],row[19],row[20],row[21],row[22],row[23],row[24],row[25],row[26],row[27],
-                            row[28],row[29],row[30],row[31],row[32],row[33],row[34],row[35],row[36],row[37],row[38],row[39],row[40],
-                            row[41],row[42],row[43],row[44],row[45])   
-    print Parameter.build_to_json() 
-    conn.close()
+def get_db_parameter():
+    query='select * from parameter where id=(select max(id) from parameter)'
+    row=query_db(query)
+    a=1
+    p=Parameter()
+    p.set_time_1(row[a])
+    p.set_temperature_1(row[a+1])
+    p.set_time_2(row[a+2])
+    p.set_temperature_2(row[a+3])
+    p.set_time_3(row[a+4])
+    p.set_temperature_3(row[a+5])
+    p.set_time_4(row[a+6])
+    p.set_temperature_4(row[a+7])
+    
+    p.set_co_2_upper_limit(row[a+8])
+    p.set_co_2_lower_limit(row[a+9])
+    p.set_cooling_start_temperature(row[a+10])
+    p.set_cooling_stop_temperature(row[a+11])
+    
+    p.set_expect_humidity(row[a+12])
+    p.set_humidity_influence_range_of_air_temperature(row[a+13])
+    p.set_low_humidity_influence_on_air_temperature(row[a+14])
+    p.set_high_humidity_influence_on_air_temperature(row[a+15])
+    p.set_expect_light(row[a+16])
+    p.set_light_influence_on_air_temperature_slope(row[a+17])
+    p.set_high_light_influence_on_temperature(row[a+18])
+    p.set_low_light_influence_on_temperature(row[a+19])
+    p.set_frost_temperature(row[a+20])
+    p.set_indoor_temperature_lower_limit(row[a+21])
+    p.set_roof_vent_wind_speed_upper_limit(row[a+22])
+    p.set_roof_vent_rain_upper_limit(row[a+23])
+    
+    p.set_heating_start_lowest_temperature(row[a+24])
+    p.set_heating_stop_highest_temperature(row[a+25])
+    
+    p.set_month_to_open_thermal_screen(row[a+26])
+    p.set_month_to_close_thermal_screen(row[a+27])
+    p.set_time_to_open_thermal_screen(row[a+28])
+    p.set_time_to_close_thermal_screen(row[a+29])
+    
+    p.set_temperature_to_open_side(row[a+30])
+    p.set_wait_time_to_open_side(row[a+31])
+    p.set_rani_upper_limit_to_close(row[a+32])
+    
+    p.set_upper_limit_light_to_open_shade_screen_out(row[a+33])
+    p.set_upper_limit_light_to_open_shade_screen_in(row[a+34])
+    p.set_soil_humidity_to_start_irrigation(row[a+35])
+    p.set_soil_humidity_to_stop_irrigation(row[a+36])
+    p.set_temperature_to_open_fogging(row[a+37])
+    p.set_temperature_to_open_cooling_pad(row[a+38])
+    
+    p.set_month_to_open_lighting(row[a+39])
+    p.set_month_to_close_lighting(row[a+40])
+    p.set_period_1_start_lighting(row[a+41])
+    p.set_period_1_stop_lighting(row[a+42])
+    p.set_period_2_start_lighting(row[a+43])
+    p.set_period_2_stop_lighting(row[a+44])
+    p.set_radiation_1_to_open_lighting(row[a+45])
+    p.set_radiation_2_to_open_lighting(row[a+46])
+    
+    p.set_roof_vent_open_time(row[a+47])
+    p.set_side_vent_time(row[a+48])
+    p.set_shade_screen_out_time(row[a+49])
+    p.set_shade_screen_in_time(row[a+50])
+    p.set_thermal_screen_open_time(row[a+51])
+     
+    return p.build_to_json() 
     print 'get parameter success'
-if __name__ == '__main__':
-    p=Parameter
-    get_db_parameter(p)
-#     init_db()
+    
+def query_db(query,args=(),one=False):
+    with app.app_context():
+        cur=get_db().execute(query,args)
+        rv=cur.fetchall()
+        cur.close()
+        return rv[0]
+
+
+
+# if __name__ == '__main__':
 #     p=Parameter()
-#     print p.get_co2_lower_limit()
+#     init_db()
+    
+#     p=Parameter()
 #     save_db_parameter(p)
+#     query='select * from parameter where id=(select max(id) from parameter)'
+#     print query_db(query)
+#     get_db_parameter()
+    
+#     print p.get_co2_lower_limit()
+    
 #      out=Outdoor()
 #      with app.app_context():
 #          db=get_db()

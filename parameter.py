@@ -2,8 +2,10 @@
 
 @author: Zxh
 '''
+from currenttime import get_current_time
 class Parameter(object):
     def __init__(self):
+        self.update_time="0"
         self.__time1="0"
         self.__temperature1="0"
         self.__time2="0"
@@ -53,32 +55,19 @@ class Parameter(object):
 
         self.__month_to_open_lighting="0"
         self.__month_to_close_lighting="0"
-        self.__time_to_close_lighting="0"
-        self.__time_to_close_lihting="0"
-        self.__radiatiopn_to_open_lighting="0"
-        self.__radiation_to_close_lihting="0"
+        self.__period1_start_lighting="0"
+        self.__period1_stop_lighting="0"
+        self.__period2_start_lighting="0"
+        self.__period2_stop_lighting="0"
+        self.__radiation1_to_open_lighting="0"
+        self.__radiation2_to_open_lighting="0"
         
         self.__roof_vent_open_time="0"
         self.__side_vent_time="0"
         self.__shade_screen_out_time="0"
         self.__shade_screen_in_time="0"
-        self.__therm_screen="0"
-    
-    def get_roof_vent_open_time(self):
-        return self.__roof_vent_open_time
-    
-    def get__side_vent_time(self):
-        return self.__side_vent_time
-    
-    def get_shade_screen_out_time(self):
-        return self.__shade_screen_out_time
-    
-    def get_shade_screen_in_tim(self):
-        return self.__shade_screen_in_time
-    
-    def get_therm_screen(self):
-        return self.__therm_screen
-        
+        self.__thermal_screen_open_time="0"
+
     def get_time_1(self):
         return self.__time1
 
@@ -111,11 +100,11 @@ class Parameter(object):
         return self.__temperature4
 
 
-    def get_co2_upper_limit(self):
+    def get_co_2_upper_limit(self):
         return self.__co2_upper_limit
 
 
-    def get_co2_lower_limit(self):
+    def get_co_2_lower_limit(self):
         return self.__co2_lower_limit
 
 
@@ -243,60 +232,48 @@ class Parameter(object):
         return self.__month_to_close_lighting
 
 
-    def get_time_to_close_lighting(self):
-        return self.__time_to_close_lighting
+    def get_period_1_start_lighting(self):
+        return self.__period1_start_lighting
 
 
-    def get_time_to_close_lihting(self):
-        return self.__time_to_close_lihting
+    def get_period_1_stop_lighting(self):
+        return self.__period1_stop_lighting
 
 
-    def get_radiatiopn_to_open_lighting(self):
-        return self.__radiatiopn_to_open_lighting
+    def get_period_2_start_lighting(self):
+        return self.__period2_start_lighting
 
 
-    def get_radiation_to_close_lihting(self):
-        return self.__radiation_to_close_lihting
+    def get_period_2_stop_lighting(self):
+        return self.__period2_stop_lighting
 
 
-    def get_light_influence_on_tempurature_slop(self):
-        return self.__light_influence_on_tempurature_slop
+    def get_radiation_1_to_open_lighting(self):
+        return self.__radiation1_to_open_lighting
 
 
-    def get_open_month(self):
-        return self.__open_month
+    def get_radiation_2_to_open_lighting(self):
+        return self.__radiation2_to_open_lighting
 
 
-    def get_stop_month(self):
-        return self.__stop_month
+    def get_roof_vent_open_time(self):
+        return self.__roof_vent_open_time
 
 
-    def get_open_time(self):
-        return self.__open_time
+    def get_side_vent_time(self):
+        return self.__side_vent_time
 
 
-    def get_stop_time(self):
-        return self.__stop_time
+    def get_shade_screen_out_time(self):
+        return self.__shade_screen_out_time
 
 
-    def get_open_temperature_setting(self):
-        return self.__open_temperature_setting
+    def get_shade_screen_in_time(self):
+        return self.__shade_screen_in_time
 
 
-    def get_wait_time_to_open(self):
-        return self.__wait_time_to_open
-
-
-    def get_light_to_open_lighting(self):
-        return self.__light_to_open_lighting
-
-
-    def get_light_start_time(self):
-        return self.__light_start_time
-
-
-    def get_light_stop_time(self):
-        return self.__light_stop_time
+    def get_thermal_screen_open_time(self):
+        return self.__thermal_screen_open_time
 
 
     def set_time_1(self, value):
@@ -463,78 +440,60 @@ class Parameter(object):
         self.__month_to_close_lighting = value
 
 
-    def set_time_to_close_lighting(self, value):
-        self.__time_to_close_lighting = value
+    def set_period_1_start_lighting(self, value):
+        self.__period1_start_lighting = value
 
 
-    def set_time_to_close_lihting(self, value):
-        self.__time_to_close_lihting = value
+    def set_period_1_stop_lighting(self, value):
+        self.__period1_stop_lighting = value
 
 
-    def set_radiatiopn_to_open_lighting(self, value):
-        self.__radiatiopn_to_open_lighting = value
+    def set_period_2_start_lighting(self, value):
+        self.__period2_start_lighting = value
 
 
-    def set_radiation_to_close_lihting(self, value):
-        self.__radiation_to_close_lihting = value
+    def set_period_2_stop_lighting(self, value):
+        self.__period2_stop_lighting = value
 
 
-    def set_light_influence_on_tempurature_slop(self, value):
-        self.__light_influence_on_tempurature_slop = value
+    def set_radiation_1_to_open_lighting(self, value):
+        self.__radiation1_to_open_lighting = value
 
 
-    def set_open_month(self, value):
-        self.__open_month = value
+    def set_radiation_2_to_open_lighting(self, value):
+        self.__radiation2_to_open_lighting = value
 
 
-    def set_stop_month(self, value):
-        self.__stop_month = value
+    def set_roof_vent_open_time(self, value):
+        self.__roof_vent_open_time = value
 
 
-    def set_open_time(self, value):
-        self.__open_time = value
+    def set_side_vent_time(self, value):
+        self.__side_vent_time = value
 
 
-    def set_stop_time(self, value):
-        self.__stop_time = value
+    def set_shade_screen_out_time(self, value):
+        self.__shade_screen_out_time = value
 
 
-    def set_open_temperature_setting(self, value):
-        self.__open_temperature_setting = value
+    def set_shade_screen_in_time(self, value):
+        self.__shade_screen_in_time = value
 
 
-    def set_wait_time_to_open(self, value):
-        self.__wait_time_to_open = value
+    def set_thermal_screen_open_time(self, value):
+        self.__thermal_screen_open_time = value
 
+        
 
-    def set_light_to_open_lighting(self, value):
-        self.__light_to_open_lighting = value
-
-
-    def set_light_start_time(self, value):
-        self.__light_start_time = value
-
-
-    def set_light_stop_time(self, value):
-        self.__light_stop_time = value
+   
     
-    def set_roof_vent_open_time(self):
-        return self.__roof_vent_open_time
+
     
-    def set__side_vent_time(self):
-        return self.__side_vent_time
     
-    def set_shade_screen_out_time(self):
-        return self.__shade_screen_out_time
-    
-    def set_shade_screen_in_tim(self):
-        return self.__shade_screen_in_time
-    
-    def set_therm_screen(self):
-        return self.__therm_screen
         
     def build_to_json(self):    
         return  '''{
+            "update_time":"%s"
            "plant_parameter_setting":{
                                 "time1":"%s",
                                 "temperature1":"%s",
@@ -591,41 +550,92 @@ class Parameter(object):
                              "temperature_to_open_cooling_pad":"%s"
                                       },
             "lighting_setting":{
-                                "month_to_open_lighting":"%s",    
-                                "month_to_close_lighting":"%s",
-                                "time_to_close_lighting":"%s",
-                                "time_to_close_lihting":"%s",
-                                "radiatiopn_to_open_lighting":"%s",
-                                "radiation_to_close_lihting":"%s"
-                                }
-                    
+                            "month_to_open_lighting":"%s",
+                            "month_to_close_lighting":"%s",
+                            "period1_start_lighting":"%s",
+                            "period1_stop_lighting":"%s",
+                            "period2_start_lighting":"%s",
+                            "period2_stop_lighting":"%s",
+                            "radiation1_to_open_lighting":"%s",
+                            "radiation2_to_open_lighting":"%s"
+                                },
+             "time_that_full_open_to_full_close":{
+                                "roof_vent_open_time":"%s"",
+                                "side_vent_open_time":"%s"",
+                                "shade_screen_out_open_time":"%s"",
+                                "shade_screen_in_open_time":"%s"",
+                                "thermal_screen_open_time":"%s""
+                             }
            }                
            '''\
-           %(self.__time1,self.__temperature1,self.__time2,self.__temperature2,self.__time3,self.__temperature3,self.__time4,
-            self.__temperature4,self.__co2_upper_limit,self.__co2_lower_limit,
-            self.__cooling_start_temperature,self.__cooling_stop_temperature,
-            self.__expect_humidity,self.__humidity_influence_range_of_air_temperature,self.__low_humidity_influence_on_air_temperature,self.__high_humidity_influence_on_air_temperature,self.__expect_light,self.__light_influence_on_air_temperature_slope,
-            self.__high_light_influence_on_temperature,self.__low_light_influence_on_temperature,self.__frost_temperature,self.__indoor_temperature_lower_limit,self.__roof_vent_wind_speed_upper_limit,self.__roof_vent_rain_upper_limit,
-            self.__heating_start_lowest_temperature,self.__heating_stop_highest_temperature,self.__month_to_open_thermal_screen,self.__month_to_close_thermal_screen,self.__time_to_open_thermal_screen,self.__time_to_close_thermal_screen,
-            self.__temperature_to_open_side,
-            self.__wait_time_to_open_side,
-            self.__rani_upper_limit_to_close,
-            self.__upper_limit_light_to_open_shade_screen_out,
-            self.__upper_limit_light_to_open_shade_screen_in,
-            self.__soil_humidity_to_start_irrigation,
-            self.__soil_humidity_to_stop_irrigation,
-            self.__temperature_to_open_fogging,
-            self.__temperature_to_open_cooling_pad,
-            self.__month_to_open_lighting,
-            self.__month_to_close_lighting,
-            self.__time_to_close_lighting,
-            self.__time_to_close_lihting,
-            self.__radiatiopn_to_open_lighting,
-            self.__radiation_to_close_lihting
+           %(get_current_time(),
+             self.__time1,
+                self.__temperature1,
+                self.__time2,
+                self.__temperature2,
+                self.__time3,
+                self.__temperature3,
+                self.__time4,
+                self.__temperature4,
+                
+                self.__co2_upper_limit,
+                self.__co2_lower_limit,
+                
+                self.__cooling_start_temperature,
+                self.__cooling_stop_temperature,
+                
+                self.__expect_humidity,
+                self.__humidity_influence_range_of_air_temperature,
+                self.__low_humidity_influence_on_air_temperature,
+                self.__high_humidity_influence_on_air_temperature,
+                self.__expect_light,
+                self.__light_influence_on_air_temperature_slope,
+                self.__high_light_influence_on_temperature,
+                self.__low_light_influence_on_temperature,
+                self.__frost_temperature,
+                self.__indoor_temperature_lower_limit,
+                self.__roof_vent_wind_speed_upper_limit,
+                self.__roof_vent_rain_upper_limit,
+                
+                self.__heating_start_lowest_temperature,
+                self.__heating_stop_highest_temperature,
+                
+                self.__month_to_open_thermal_screen,
+                self.__month_to_close_thermal_screen,
+                self.__time_to_open_thermal_screen,
+                self.__time_to_close_thermal_screen,
+                
+                self.__temperature_to_open_side,
+                self.__wait_time_to_open_side,
+                self.__rani_upper_limit_to_close,
+                
+                self.__upper_limit_light_to_open_shade_screen_out,
+                self.__upper_limit_light_to_open_shade_screen_in,
+                self.__soil_humidity_to_start_irrigation,
+                self.__soil_humidity_to_stop_irrigation,
+                self.__temperature_to_open_fogging,
+                self.__temperature_to_open_cooling_pad,
+        
+                self.__month_to_open_lighting,
+                self.__month_to_close_lighting,
+                self.__period1_start_lighting,
+                self.__period1_stop_lighting,
+                self.__period2_start_lighting,
+                self.__period2_stop_lighting,
+                self.__radiation1_to_open_lighting,
+                self.__radiation2_to_open_lighting,
+                
+                self.__roof_vent_open_time,
+                self.__side_vent_time,
+                self.__shade_screen_out_time,
+                self.__shade_screen_in_time,
+                self.__thermal_screen_open_time
             )
 #test
 if __name__=='__main__':
 #     print Parameter().get_co2_lower_limit()
     test=Parameter()
-#     print test.co2_lower_limit
-    print test.build_to_json()
+#     d="d"
+#     test.set__side_vent_time(d)
+    print test.get_co_2_lower_limit()
+#     print test.build_to_json()

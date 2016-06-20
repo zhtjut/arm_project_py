@@ -168,6 +168,10 @@ def tri_state_relay(key,value):
         print '%s relay02 off' %key
         println(out_str)
 
+def get_all_state():
+    out_str=Query_all
+    println(out_str)
+
 #test
 # str="lighting_2"
 # print control_relay.get("bi_state").get(str)

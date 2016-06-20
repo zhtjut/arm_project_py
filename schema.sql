@@ -58,9 +58,10 @@ create table if not exists 'control_state'(
 --	co2_upper_limit text not null,
 --    co2_lower_limit text not null
 --);
-
-create table if not exists 'parameter'(
+drop table if exists parameter;
+create table parameter(
 	id integer primary key autoincrement,
+	update_time not null,
 	time1 text not null,
     temperature1 text not null,
     time2 text not null,
@@ -69,6 +70,7 @@ create table if not exists 'parameter'(
     temperature3 text not null,
     time4 text not null,
     temperature4 text not null,
+    
     co2_upper_limit text not null,
     co2_lower_limit text not null,
     
@@ -108,9 +110,17 @@ create table if not exists 'parameter'(
     temperature_to_open_cooling_pad text not null,
     
     month_to_open_lighting text not null,
-    month_to_close_lighting text not null,
-    time_to_close_lighting text not null,
-    time_to_close_lihting text not null,
-    radiatiopn_to_open_lighting text not null,
-    radiation_to_close_lihting text not null
-)
+	month_to_close_lighting text not null,
+	period1_start_lighting text not null,
+	period1_stop_lighting text not null,
+	period2_start_lighting text not null,
+	period2_stop_lighting text not null,
+	radiation1_to_open_lighting text not null,
+	radiation2_to_open_lighting text not null,
+	
+	roof_vent_open_time text not null,
+	side_vent_open_time text not null,
+	shade_screen_out_open_time text not null,
+	shade_screen_in_open_time text not null,
+	thermal_screen_open_time text not null
+	)

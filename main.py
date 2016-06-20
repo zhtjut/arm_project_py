@@ -74,7 +74,7 @@ def parameter():
         save_db_parameter(Parameter)
         return 'save success'
     else:
-        return 
+        return get_db_parameter()
 
 
 @app.route('/hi')
