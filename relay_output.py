@@ -151,11 +151,11 @@ def tri_state_relay(key,value):
         print '%s relay01 on' %key
         println(out_str)
     elif value=="off":
-        out_str=str1.get("on")[0]
-        print '\n%s relay02 on' %key
-        println(out_str)
         out_str=str1.get("off")[1]
-        print '%s relay01 off' %key
+        print '\n%s relay01 off' %key
+        println(out_str)
+        out_str=str1.get("on")[0]
+        print '%s relay02 on' %key
         println(out_str)
     else:
         out_str=str1.get("off")[1]

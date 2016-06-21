@@ -246,4 +246,3 @@ class auto_run_alogrithm(object):
     def set_parameter(self, value):
         self.parameter = value
 
-        

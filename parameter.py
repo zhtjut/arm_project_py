@@ -3,6 +3,8 @@
 @author: Zxh
 '''
 from currenttime import get_current_time
+import json
+
 class Parameter(object):
     def __init__(self):
         self.update_time="0"
@@ -484,7 +486,15 @@ class Parameter(object):
         self.__thermal_screen_open_time = value
 
         
-
+    def handle_post_parameter(self,data):
+        data=json.loads(data)
+        self.update_time=data['update_time']
+        plant_parameter_setting=data['plant_parameter_setting']
+        co2_parameter_setting=data['co2_parameter_setting']
+        cooling_fans=data['cooling_fans']
+        roof_vent_parameter_setting=data['roof_vent_parameter_setting']
+        heating_parameter_setting=data['heating_parameter_setting']
+        
    
     
 
@@ -493,7 +503,7 @@ class Parameter(object):
         
     def build_to_json(self):    
         return  '''{
-            "update_time":"%s"
+            "update_time":"%s",
            "plant_parameter_setting":{
                                 "time1":"%s",
                                 "temperature1":"%s",
@@ -502,7 +512,7 @@ class Parameter(object):
                                 "time3":"%s",
                                 "temperature3":"%s",
                                 "time4":"%s",
-                                "temperature4":"%s",
+                                "temperature4":"%s"
                                       },
            "co2_parameter_setting":{
                                 "co2_upper_limit":"%s",
@@ -560,11 +570,11 @@ class Parameter(object):
                             "radiation2_to_open_lighting":"%s"
                                 },
              "time_that_full_open_to_full_close":{
-                                "roof_vent_open_time":"%s"",
-                                "side_vent_open_time":"%s"",
-                                "shade_screen_out_open_time":"%s"",
-                                "shade_screen_in_open_time":"%s"",
-                                "thermal_screen_open_time":"%s""
+                                "roof_vent_open_time":"%s",
+                                "side_vent_open_time":"%s",
+                                "shade_screen_out_open_time":"%s",
+                                "shade_screen_in_open_time":"%s",
+                                "thermal_screen_open_time":"%s"
                              }
            }                
            '''\

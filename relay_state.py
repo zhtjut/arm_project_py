@@ -138,4 +138,6 @@ def string_to_bin(str_in):
             str2+='0'
     return str2+str(a)
 
+str2="EF"
+print '{0:b}'.format(int(str2,16))
 # get_control_state(Query_all_return,co)
