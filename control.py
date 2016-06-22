@@ -147,28 +147,26 @@ class Control(object):
     def build_json(self):
         return '''
         {
-            "update_time":"%s"
-            "actuator":{
-                "tri_state":{
-                    "roof_vent_south": "%s",
-                    "roof_vent_north": "%s",
-                    "side_vent": "%s",
-                    "shade_screen_out": "%s",
-                    "shade_screen_in": "%s",
-                    "thermal_screen": "%s"
-                },
-                "bi_state":{
-                    "cooling_pad": "%s",
-                    "fogging": "%s",
-                    "heating": "%s",
-                    "co2": "%s",
-                    "lighting_1": "%s",
-                    "lighting_2": "%s",
-                    "irrigation": "%s"
-                },
-                
+    "update_time": "2016-06-22 18:52:27",
+    "actuator": {
+        "tri_state": {
+            "roof_vent_south": "off",
+            "roof_vent_north": "off",
+            "side_vent": "off",
+            "shade_screen_out": "off",
+            "shade_screen_in": "off",
+            "thermal_screen": "off"
+        },
+        "bi_state": {
+            "cooling_pad": "off",
+            "fogging": "off",
+            "heating": "off",
+            "co2": "off",
+            "lighting_1": "off",
+            "lighting_2": "off",
+            "irrigation": "off"
+                }
             }
-
         }''' \
                % (get_current_time(),self.get_roof_vent_south(), self.get_roof_vent_north(), self.get_side_vent(),
                   self.get_shade_screen_out(), self.get_shade_screen_in(),
