@@ -11,3 +11,6 @@ a=[1,
 print a
 a=0.0
 print a==0
+a=7
+b="6"
+print a>b

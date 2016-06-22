@@ -7,10 +7,10 @@ from currenttime import get_current_time
 class Outdoor(object):
     def __init__(self):
         self.__update_time = "just now"
-        self.__temperature = "0"
-        self.__humidity = "0"
-        self.__radiation = "0"
-        self.__co2 = "0"
+        self.__temperature = "10"
+        self.__humidity = "5"
+        self.__radiation = "300"
+        self.__co2 = "600"
         self.__wind_direction = "no wind"
         self.__wind_speed = "0"
         self.__rain = "0"

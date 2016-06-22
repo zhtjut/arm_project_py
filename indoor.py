@@ -6,10 +6,10 @@ class Indoor:
 
     def __init__(self, name):
         self.name = name
-        self.__temperature = 0
-        self.__humidity = 0
-        self.__radiation = 0
-        self.__co2 = 0
+        self.__temperature = 5
+        self.__humidity = 60
+        self.__radiation = 500
+        self.__co2 = 400
 
     def set_temperature(self, temperature):
         self.__temperature = temperature

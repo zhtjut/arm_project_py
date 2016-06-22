@@ -8,6 +8,7 @@ from indoor import Indoor
 from scheduler import Scheduler
 from parameter import Parameter
 from database import save_db_indoor, save_db_outdoor, save_db_control,get_db_parameter,save_db_parameter
+from autorun import auto_run_main
 
 app = Flask(__name__)
 
@@ -16,6 +17,7 @@ outdoor = Outdoor()
 c = Control()
 p=Parameter()
 
+control_method="auto"
 
 def update_indoor():
 #     save_db_indoor(node0)
@@ -59,7 +61,9 @@ def response_outdoor():
 
 
 @app.route('/control', methods=['GET', 'POST'])
-def control():
+def manul_control():
+    global control_method
+    control_method="computer_control"
     if request.method == 'POST':
         try:
             data = request.data
@@ -68,6 +72,24 @@ def control():
             return "你追我，如果你追到我，我就让你你嘿嘿嘿！"
     else:
         return c.build_json()
+
+@app.route('/auto')
+def auto_run():
+    global control_method
+    control_method=="auto"
+    auto.start()
+
+def auto_running():
+    global node0,c,outdoor,p
+    auto_run_main(node0,c,outdoor,p)
+auto=Scheduler(900,auto_run())
+
+@app.route('/computer')
+def computer_control():
+    global control_method
+    if control_method=="auto":
+        auto.stop()
+    control_method="computer_control"
 
 @app.route('/parameter',methods=['GET','POST'])
 def parameter():
@@ -78,12 +100,6 @@ def parameter():
         return 'save success'
     else:
         return get_db_parameter()
-
-@app.route('/hi')
-def change():
-    node0.set_temperature(30.0)
-    return '<h1>set temp from 20 to 30</h1>'
-
 
 if __name__ == '__main__':
     app.run('0.0.0.0', '8020')

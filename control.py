@@ -7,13 +7,13 @@ class Control(object):
     '''the object of tri-state actuators and bi-state'''
 
     def __init__(self):
-        self.__roof_vent_south = "off"
-        self.__roof_vent_north = "off"
-        self.__side_vent = "off"
-        self.__shade_screen_out = "off"
-        self.__shade_screen_in = "off"
-        self.__thermal_screen = "off"
-        self.__cooling_pad = "off"
+        self.__roof_vent_south = "on"
+        self.__roof_vent_north = "on"
+        self.__side_vent = "on"
+        self.__shade_screen_out = "on"
+        self.__shade_screen_in = "on"
+        self.__thermal_screen = "on"
+        self.__cooling_pad = "on"
         self.__fogging = "off"
         self.__heating = "off"
         self.__co2 = "off"
