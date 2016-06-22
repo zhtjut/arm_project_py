@@ -3,246 +3,311 @@
 @author: Zxh
 '''
 from currenttime import get_current_hour, get_current_month,get_time,get_current_time
-from indoor import Indoor
-from outdoor import Outdoor
-from control import Control
-from parameter import Parameter
 
-class auto_run_alogrithm(object):
-    now_time="9"
-    temperature_set_temp0="0"
+from relay_output import bi_state_relay_output, tri_state_relay_output
+
+
+
+def init_parameter():
+    global now_time,temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,side_wait_time,lighting_open_time,lighting_open_time2,lighting_stop_time,lighting_stop_time2,lighting_stop_time3
+    global bad_weather
+    now_time=get_current_time(),
+    temperature_set_temp0="0",
     temperature_set_temp1="1"
     temperature_set_temp2="2"
     side_wait_time="0"
-        
+            
     lighting_open_time="0"
     lighting_open_time2="0"
     lighting_stop_time="0"
     lighting_stop_time2="0"
     lighting_stop_time3="0"
-    node0=Indoor('node')
-    outdoor=Outdoor()
-    control=Control()
-    parameter=Parameter()
     
-    def __init__(self,Indoor,Outdoor,Control,Parameter):
-        self.node0=Indoor
-        self.outdoor=Outdoor
-        self.control=Control
-        self.parameter=Parameter
-    #indoor temperature humidity, light
-    def roof_vent_control(self):
-        if self.outdoor.get_bad_weather()=="true":
-            self.control.set_roof_vent_north("off")
-            self.control.set_roof_vent_south("off")
-        else:
-            if self.now_time >= self.parameter.get_time_1() and self.now_time < self.parameter.get_time_2():
-                self.temperature_set_temp0=self.parameter.get_temperature_1()
-            elif self.now_time >= self.parameter.get_time_2() and self.now_time < self.parameter.get_time_3():
-                self.temperature_set_temp0=self.parameter.get_temperature2
-            elif self.now_time >= self.parameter.get_time_3() and self.now_time < self.parameter.get_time_4():
-                self.temperature_set_temp0=self.parameter.get_temperature3
-            else:
-                self.temperature_set_temp0=self.parameter.get_temperature4  
-            
-            #humidity influence on temperature
-            if self.node0.get_humidity()<=(self.parameter.get_expect_humidity()-5-self.parameter.get_humidity_influence_range_of_air_temperature()):
-                temperature_set_temp1=self.temperature_set_temp0+self.parameter.get_low_humidity_influence_on_air_temperature()
-            elif self.node0.get_humidity()<=(self.parameter.get_expect_humidity()-5):
-                tmpt=(self.parameter.get_expect_humidity()-5-self.node0.get_humidity())*self.parameter.get_low_humidity_influence_on_air_temperature()/self.parameter.get_humidity_influence_range_of_air_temperature()
-                temperature_set_temp1=self.temperature_set_temp0+tmpt
-            elif self.node0.get_humidity()>=(self.parameter.get_expect_humidity()+5):
-                tmpt=(self.node0.get_humidity()-self.parameter.get_expect_humidity()-5)*self.parameter.get_high_humidity_influence_on_air_temperature()/(100-5-self.parameter.get_expect_humidity())
-                temperature_set_temp1=self.temperature_set_temp0+tmpt
-            else:
-                temperature_set_temp1=self.temperature_set_temp0
-                
-            #light influence on temperature
-            if self.outdoor.get_radiation()<self.parameter.get_expect_light:
-                self.temperature_set_temp2=temperature_set_temp1
-            else:
-                self.temperature_set_temp2=temperature_set_temp1-self.parameter.get_light_influence_on_air_temperature_slope()*(self.outdoor.get_radiation()-self.parameter.get_expect_light())
-            
-            if self.temperature_set_temp2>(temperature_set_temp1+self.parameter.get_low_light_influence_on_temperature()):
-                self.temperature_set_temp2=temperature_set_temp1+self.parameter.get_low_light_influence_on_temperature()
-            elif self.temperature_set_temp2<(temperature_set_temp1-self.parameter.get_high_light_influence_on_temperature()):
-                self.temperature_set_temp2=temperature_set_temp1-self.parameter.get_high_light_influence_on_temperature()
-                
-            if self.temperature_set_temp2<"0":
-                self.temperature_set_temp2="0"
-            
-            if self.outdoor.get_temperature()<=self.parameter.get_frost_temperature():
-                self.control.set_roof_vent_north("off")
-                self.control.set_roof_vent_south("off")
-            elif self.outdoor.get_temperature()<=self.parameter.get_indoor_temperature_lower_limit():    
-                #small angle  
-                self.control.set_roof_vent_north("on")
-                self.control.set_roof_vent_south("on")
-            elif self.outdoor.get_temperature()<=self.temperature_set_temp2:
-                #open all
-                self.control.set_roof_vent_north("on")
-                self.control.set_roof_vent_south("on")
-            else:
-                #  
-                self.control.set_roof_vent_north("on")
-                self.control.set_roof_vent_south("on")
-            
-    def get_side_wait_time(self):
-        if self.node0.temperature>(self.temperature_set_temp2+self.parameter.get_temperature_to_open_side()):
-            if self.side_wait_time<self.parameter.get_wait_time_to_open_side():
-                self.side_wait_time+=1
-            
-    def side_vent_control(self):
-        if self.outdoor.get_bad_weather()=="true":
-            self.control.set_side_vent("off")
+    bad_weather="true"
+
+def get_current_control_state(Control):
+    global auto_roof_vent_south ,auto_roof_vent_north ,auto_side_vent ,auto_shade_screen_out,auto_shade_screen_in ,auto_thermal_screen,auto_cooling_pad,auto_fogging ,auto_heating,auto_co2
+#     global auto_lighting_1,auto_lighting_2,auto_irrigation
+    auto_cooling_pad=Control.get_cooling_pad()
+    auto_roof_vent_south =Control.get_roof_vent_south()
+    auto_roof_vent_north =Control.get_roof_vent_north()
+    auto_side_vent =Control.get_side_vent()
+    auto_shade_screen_out =Control.get_shade_screen_out()
+    auto_shade_screen_in =Control.get_shade_screen_in()
+    auto_thermal_screen = Control.get_thermal_screen()
+    auto_cooling_pad = Control.get_cooling_pad()
+    auto_fogging = Control.get_fogging()
+    auto_heating = Control.get_heating()
+    auto_co2 = Control.get_co2()
+#     auto_lighting_1 = Control.get_lighting_1()
+#     auto_lighting_2 = Control.get_lighting_2()
+#     auto_irrigation = Control.get_irrigation()
+    
+def autorun_main(Indoor,Outdoor,Control,Parameter):
+    init_parameter()
+    get_current_control_state(Control)
+    co2_control(Indoor,Parameter)
+    shade_screen_out_control(Outdoor,Parameter)
+    cooling_pad_control(Indoor,Parameter)
+    fogging_control(Indoor,Parameter)
+    roof_vent_control(Outdoor,Parameter,Indoor)
+    side_vent_control(Parameter)
+    thermal_screen_control(Outdoor,Parameter)
+    heating_control(Indoor,Parameter)
+    shade_screen_in_control(Outdoor,Parameter)
+    lighting_control(Control,Outdoor,Parameter)
+#indoor temperature humidity, light
+
+def co2_control(Indoor,Parameter):
+    if Indoor.get_co2()<Parameter.get_co_2_lower_limit():
+        bi_state_relay_output("co2","on")
+        auto_co2="on"
+    elif Indoor.get_co2()>Parameter.get_co_2_upper_limit():
+        bi_state_relay_output("co2","off")
+        auto_co2="off"
         
-        elif self.control.__cooling_pad=="on":
-            self.control.set_side_vent("on")
-        elif self.control.__roof_vent_north=="on" and self.control.__roof_vent_south=="on":
-            if self.side_wait_time<self.parameter.get_wait_time_to_open_side():
-                self.control.set_side_vent("off")
-            elif self.side_wait_time>self.parameter.get_wait_time_to_open_side() and self.side_wait_time<2*self.parameter.get_wait_time_to_open_side():
-                #half open
-                self.control.set_side_vent("on")
-            else:
-                self.control.set_side_vent("on")
+def shade_screen_out_control(Outdoor,Parameter):
+    if bad_weather=="true":
+        tri_state_relay_output("shade_screen_out", "off")
+        auto_shade_screen_out="off"
+#         self.control.set_shade_screen_out("off")
+    elif Outdoor.get_radiation()>Parameter.get_upper_limit_light_to_open_shade_screen_out():
+        tri_state_relay_output("shade_screen_out", "on")
+        auto_shade_screen_out="on"
+#         self.control.set_shade_screen_out("on")
+    else:
+        auto_shade_screen_out="off"
+        tri_state_relay_output("shade_screen_out", "off")
+#         self.control.set_shade_screen_out("off")
+
+def cooling_pad_control(Indoor,Parameter):
+    if float(Indoor.get_temperature())> float(Parameter.get_temperature_to_open_cooling_pad())+1:
+        bi_state_relay_output("shade_screen_out", "on")
+        auto_cooling_pad="on"
+#         self.control.set_cooling_pad("on")
+    elif float(Indoor.get_temperature())<float(Parameter.get_temperature_to_open_cooling_pad())-1:
+        bi_state_relay_output("shade_screen_out", "off")
+        auto_cooling_pad="off"
+#         self.control.set_cooling_pad("off")
+        
+def fogging_control(Indoor,Parameter):
+    if float(Indoor.get_temperature())>float(Parameter.get_temperature_to_open_fogging())+1:
+        bi_state_relay_output("fogging", "on")
+        auto_fogging="on"
+#         Control.set_fogging("on")
+        # if Control.get_thermal_screen()=="on"
+        #    Control.set_thermal_screen("off")
+    elif float(Indoor.get_temperature())<float(Parameter.get_temperature_to_open_fogging())-1:
+        bi_state_relay_output("fogging", "off")
+        auto_fogging="off"
+#             Control.set_fogging("off")
+
+def roof_vent_control(Outdoor,Parameter,Indoor):
+    if bad_weather=="true":
+        tri_state_relay_output("roof_vent_south","off")
+        tri_state_relay_output("roof_vent_north","off")
+        auto_roof_vent_north="off"
+        auto_roof_vent_south="off"
+#         self.control.set_roof_vent_north("off")
+#         self.control.set_roof_vent_south("off")
+    else:
+        if now_time >= Parameter.get_time_1() and now_time < Parameter.get_time_2():
+            temperature_set_temp0=Parameter.get_temperature_1()
+        elif now_time >= Parameter.get_time_2() and now_time < Parameter.get_time_3():
+            temperature_set_temp0=Parameter.get_temperature2
+        elif now_time >= Parameter.get_time_3() and now_time < Parameter.get_time_4():
+            temperature_set_temp0=Parameter.get_temperature3
         else:
-            self.control.set_side_vent("off")
+            temperature_set_temp0=Parameter.get_temperature4  
+        
+        #humidity influence on temperature
+        if Outdoor.get_humidity()<=(Parameter.get_expect_humidity()-5-Parameter.get_humidity_influence_range_of_air_temperature()):
+            temperature_set_temp1=temperature_set_temp0+Parameter.get_low_humidity_influence_on_air_temperature()
+        elif Outdoor.get_humidity()<=(Parameter.get_expect_humidity()-5):
+            tmpt=(Parameter.get_expect_humidity()-5-Outdoor.get_humidity())*Parameter.get_low_humidity_influence_on_air_temperature()/Parameter.get_humidity_influence_range_of_air_temperature()
+            temperature_set_temp1=temperature_set_temp0+tmpt
+        elif Outdoor.get_humidity()>=(Parameter.get_expect_humidity()+5):
+            tmpt=(Outdoor.get_humidity()-Parameter.get_expect_humidity()-5)*Parameter.get_high_humidity_influence_on_air_temperature()/(100-5-Parameter.get_expect_humidity())
+            temperature_set_temp1=temperature_set_temp0+tmpt
+        else:
+            temperature_set_temp1=temperature_set_temp0
             
-    def shade_screen_out_control(self):
-        if self.outdoor.get_bad_weather()=="true":
-            self.control.set_shade_screen_out("off")
-        elif self.outdoor.get_radiation()>self.parameter.get_upper_limit_light_to_open_shade_screen_out():
-            self.control.set_shade_screen_out("on")
+        #light influence on temperature
+        if Outdoor.get_radiation()<Parameter.get_expect_light():
+            temperature_set_temp2=temperature_set_temp1
         else:
-            self.control.set_shade_screen_out("off")
-    
-    def shade_screen_in_control(self):
-        if self.control.__thermal_screen=="on":
-            self.control.set_shade_screen_in("on")
-        elif self.outdoor.get_radiation()>self.parameter.get_upper_limit_light_to_open_shade_screen_in():
-            self.control.set_shade_screen_in("off")
-        else:
-            self.control.set_shade_screen_in("on")
+            temperature_set_temp2=temperature_set_temp1-Parameter.get_light_influence_on_air_temperature_slope()*(Outdoor.get_radiation()-Parameter.get_expect_light())
+        
+        if temperature_set_temp2>(temperature_set_temp1+Parameter.get_low_light_influence_on_temperature()):
+            temperature_set_temp2=temperature_set_temp1+Parameter.get_low_light_influence_on_temperature()
+        elif temperature_set_temp2<(temperature_set_temp1-Parameter.get_high_light_influence_on_temperature()):
+            temperature_set_temp2=temperature_set_temp1-Parameter.get_high_light_influence_on_temperature()
             
-    def thermal_screen_control(self):
-        if self.outdoor.get_bad_weather()=="true":
-            self.control.set_thermal_screen("off")
-        elif self.control.__fogging=="on":
-            self.control.set_thermal_screen("off")
+        if temperature_set_temp2<"0":
+            temperature_set_temp2="0"
+        
+        if Outdoor.get_temperature()<=Parameter.get_frost_temperature():
+            tri_state_relay_output("roof_vent_south","off")
+            tri_state_relay_output("roof_vent_north","off")
+            auto_roof_vent_north="off"
+            auto_roof_vent_south="off"
+#             Control.set_roof_vent_north("off")
+#             Control.set_roof_vent_south("off")
+        elif Outdoor.get_temperature()<=Parameter.get_indoor_temperature_lower_limit():    
+            #small angle
+            tri_state_relay_output("roof_vent_south","on")
+            tri_state_relay_output("roof_vent_north","on") 
+            auto_roof_vent_north="on"
+            auto_roof_vent_south="on" 
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
+        elif Outdoor.get_temperature()<=temperature_set_temp2:
+            #open all
+            tri_state_relay_output("roof_vent_south","on")
+            tri_state_relay_output("roof_vent_north","on")
+            auto_roof_vent_north="on"
+            auto_roof_vent_south="on" 
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
         else:
-            current_hour=get_current_hour()
-            current_month=get_current_month()
-            if current_month>self.parameter.get_month_to_open_thermal_screen() and current_month<self.parameter.get_month_to_close_thermal_screen():
-                if current_hour>self.parameter.get_time_to_open_thermal_screen() and current_hour<self.parameter.get_time_to_close_thermal_screen():
-                    self.control.set_thermal_screen("off")    #open
-            else:
-                self.control.set_thermal_screen("on") #
-                
-                
-    def heating_control(self):  #ok
-        if self.self.node0.get_temperature()<self.self.parameter.get_heating_start_lowest_temperature():
-                self.control.set_heating("on")
-        elif self.self.node0.get_temperature()>self.self.parameter.get_heating_stop_highest_temperature():
-                self.control.set_heating("off")   
-                
-    def fogging_control(self):
-        if self.node0.get_temperature()>self.parameter.get_temperature_to_open_fogging()+1:
-            self.control.set_fogging("on")
-            # if control.get_thermal_screen()=="on"
-            #    control.set_thermal_screen("off")
-        elif self.node0.get_temperature()<self.parameter.get_temperature_to_open_fogging()-1:
-            self.control.set_fogging("off")
+            #  
+            tri_state_relay_output("roof_vent_south","on")
+            tri_state_relay_output("roof_vent_north","on")
+            auto_roof_vent_north="on"
+            auto_roof_vent_south="on" 
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
+        
+def get_side_wait_time(Indoor,Parameter):
+    if Indoor.get_temperature()>(temperature_set_temp2+Parameter.get_temperature_to_open_side()):
+        if side_wait_time<Parameter.get_wait_time_to_open_side():
+            side_wait_time+=1
+        
+def side_vent_control(Parameter):
+    if bad_weather=="true":
+        tri_state_relay_output("side_vent","off")
+        auto_side_vent="off"
+#         control.set_side_vent("off")
+    elif auto_cooling_pad=="on":
+        tri_state_relay_output("side_vent", "on")
+
+#         control.set_side_vent("on")
+    elif auto_roof_vent_north=="on" and auto_roof_vent_south=="on":
+        if side_wait_time<Parameter.get_wait_time_to_open_side():
+#             control.set_side_vent("off")
+            tri_state_relay_output("side_vent", "off")
+        elif side_wait_time>Parameter.get_wait_time_to_open_side() and side_wait_time<2*Parameter.get_wait_time_to_open_side():
+            #half open
+            tri_state_relay_output("side_vent", "on")
+#             control.set_side_vent("on")
+        else:
+            tri_state_relay_output("side_vent", "on")
+#             control.set_side_vent("on")
+    else:
+        tri_state_relay_output("side_vent", "on")
+#         control.set_side_vent("off")
     
-    def cooling_pad_control(self):
-        if self.node0.get_temperature()>self.parameter.get_temperature_to_open_cooling_pad()+1:
-            self.control.set_cooling_pad("on")
-        elif self.node0.get_temperature()<self.parameter.get_temperature_to_open_cooling_pad()-1:
-            self.control.set_cooling_pad("off")
-    
-    def co2_control(self):
-        if self.node0.get_co2()<self.parameter.get_co_2_lower_limit():
-            self.control.set_co2("on")
-        elif self.node0.get_co2()>self.parameter.get_co_2_upper_limit():
-            self.control.set_co2("off")
-    
-    def irrigation_control(self):            
-        pass
-    
-    
-    def lighting_control(self):
-        while True:
-            if self.control.get_lighting_1()=="off" and self.control.get_lighting_2()=="off":
-                if get_current_month()>self.parameter.get_month_to_open_lighting() and get_current_month()<self.parameter.get_month_to_close_lighting():
-                    if get_current_time()>self.parameter.get_period_1_start_lighting() and get_current_time()<self.parameter.get_period_1_stop_lighting():
-                        if self.outdoor.get_radiation()<self.parameter.get_radiation_1_to_open_lighting():
-                            self.control.set_lighting_1("on")
-                            lighting_open_time=get_time()
-                    elif get_current_time()>self.parameter.get_period_2_start_lighting() and get_current_time()<self.parameter.get_period_2_stop_lighting():
-                        if self.outdoor.get_radiation()<self.parameter.get_radiation_2_to_open_lighting():
-                            self.control.set_lighting_1("on")
-                            lighting_open_time2=get_time()
-    
-            elif self.control.get_lighting_1()=="on" and self.control.get_lighting_2()=="off":
-                t1=int(get_time()-lighting_open_time)
-                t2=int(get_time()-lighting_open_time2)
-                if t1>1750 and t1<1850:
-                    self.control.set_lighting_2("on")
-                if t2>1750 and t2<1850:
-                    self.control.set_lighting_2("on")
-    
-            elif self.control.get_lighting_1()=="on" and self.control.get_lighting_2()=="on":
-                if get_current_time()>self.parameter.get_period_1_start_lighting() and get_current_time()<self.parameter.get_period_1_stop_lighting():
-                    if self.outdoor.get_radiation()>self.parameter.get_radiation_1_to_open_lighting():
-                        self.control.set_lighting_1("off")
-                        lighting_stop_time=get_time()
-                elif get_current_time()>self.parameter.get_period_2_start_lighting() and get_current_time()<self.parameter.get_period_2_stop_lighting():
-                    if self.outdoor.get_radiation()>self.parameter.get_radiation_2_to_open_lighting():
-                        self.control.set_lighting_1("off")
-                        lighting_stop_time2=get_time()
-                else:
-                    self.control.set_lighting_1("off")
-                    lighting_stop_time3=get_time()
-    
-            elif self.control.get_lighting_1()=="off" and self.control.get_lighting_2()=="on":
-                t3=get_time()-lighting_stop_time3
-                t4=get_time()-lighting_stop_time2
-                t5=get_time()-lighting_stop_time
-                if t3>1750 and t3<1850:
-                    self.control.set_lighting_2("off")
-                if t4>1750 and t4<1850:
-                    self.control.set_lighting_2("off")
-                if t5>1750 and t5<1850:
-                    self.control.set_lighting_2("off")
+def thermal_screen_control(Outdoor,Parameter):
+    if bad_weather=="true":
+        tri_state_relay_output("thermal_screen", "off")
+        auto_thermal_screen="off"
+#         control.set_thermal_screen("off")
+    elif auto_fogging=="on":
+        auto_thermal_screen="off"
+        tri_state_relay_output("thermal_screen", "off")
+#         control.set_thermal_screen("off")
+    else:
+        current_hour=get_current_hour()
+        current_month=get_current_month()
+        if current_month>Parameter.get_month_to_open_thermal_screen() and current_month<Parameter.get_month_to_close_thermal_screen():
+            if current_hour>Parameter.get_time_to_open_thermal_screen() and current_hour<Parameter.get_time_to_close_thermal_screen():
+                tri_state_relay_output("thermal_screen", "off")
+                auto_thermal_screen="off"
+#                 control.set_thermal_screen("off")    #open
+        else:
+            tri_state_relay_output("thermal_screen", "on")
+            auto_thermal_screen="on"
+#             control.set_thermal_screen("on") 
+            
+def heating_control(Indoor,Parameter):  #ok
+    if Indoor.get_temperature()<Parameter.get_heating_start_lowest_temperature():
+        bi_state_relay_output("heating", "on")
+#         self.control.set_heating("on")
+    elif Indoor.get_temperature()>Parameter.get_heating_stop_highest_temperature():
+        bi_state_relay_output("heating", "on")
+#         self.control.set_heating("off") 
 
-    def get_node_0(self):
-        return self.node0
+def shade_screen_in_control(Outdoor,Parameter):
+    if auto_thermal_screen=="on":
+        tri_state_relay_output("shade_screen_in","on")
+        auto_shade_screen_in="on"
+#         self.control.set_shade_screen_in("on")
+    elif Outdoor.get_radiation()>Parameter.get_upper_limit_light_to_open_shade_screen_in():
+#         self.control.set_shade_screen_in("off")
+        tri_state_relay_output("shade_screen_in","off")
+    else:
+        tri_state_relay_output("shade_screen_in","on")
+#         self.control.set_shade_screen_in("on")
+        
+def lighting_control(Control,Outdoor,Parameter):
+    auto_lighting_1 = Control.get_lighting_1()
+    auto_lighting_2 = Control.get_lighting_2()
+    if auto_lighting_1=="off" and auto_lighting_2=="off":
+        if get_current_month()>Parameter.get_month_to_open_lighting() and get_current_month()<Parameter.get_month_to_close_lighting():
+            if get_current_time()>Parameter.get_period_1_start_lighting() and get_current_time()<Parameter.get_period_1_stop_lighting():
+                if Outdoor.get_radiation()<Parameter.get_radiation_1_to_open_lighting():
+#                         Control.set_lighting_1("on")
+                    bi_state_relay_output("lighting_1", "on")
+                    auto_lighting_1="on"
+                    lighting_open_time=get_time()
+            elif get_current_time()>Parameter.get_period_2_start_lighting() and get_current_time()<Parameter.get_period_2_stop_lighting():
+                if Outdoor.get_radiation()<Parameter.get_radiation_2_to_open_lighting():
+#                         Control.set_lighting_1("on")
+                    bi_state_relay_output("lighting_2", "on")
+                    auto_lighting_2="on"
+                    lighting_open_time2=get_time()
 
+    elif auto_lighting_1=="on" and auto_lighting_2=="off":
+        t1=int(get_time()-lighting_open_time)
+        t2=int(get_time()-lighting_open_time2)
+        if t1>1750 and t1<1850:
+            bi_state_relay_output("ligting_2", "on")
+            auto_lighting_2="on"
+#                 Control.set_lighting_2("on")
+        if t2>1750 and t2<1850:
+#                 Control.set_lighting_2("on")
+            bi_state_relay_output("ligting_2", "on")    
+            auto_lighting_2="on"
+    elif auto_lighting_1=="on" and auto_lighting_2=="on":
+        if get_current_time()>Parameter.get_period_1_start_lighting() and get_current_time()<Parameter.get_period_1_stop_lighting():
+            if Outdoor.get_radiation()>Parameter.get_radiation_1_to_open_lighting():
+#                     Control.set_lighting_1("off")
+                bi_state_relay_output("ligting_1", "off")  
+                auto_lighting_1="off"
+                lighting_stop_time=get_time()
+        elif get_current_time()>Parameter.get_period_2_start_lighting() and get_current_time()<Parameter.get_period_2_stop_lighting():
+            if Outdoor.get_radiation()>Parameter.get_radiation_2_to_open_lighting():
+#                     Control.set_lighting_1("off")
+                bi_state_relay_output("ligting_1", "off")
+                auto_lighting_1="off"  
+                lighting_stop_time2=get_time()
+        else:
+#                 Control.set_lighting_1("off")
+            bi_state_relay_output("ligting_1", "off")
+            auto_lighting_1="off"  
+            lighting_stop_time3=get_time()
 
-    def get_outdoor(self):
-        return self.outdoor
-
-
-    def get_control(self):
-        return self.control
-
-
-    def get_parameter(self):
-        return self.parameter
-
-
-    def set_node_0(self, value):
-        self.node0 = value
-
-
-    def set_outdoor(self, value):
-        self.outdoor = value
-
-
-    def set_control(self, value):
-        self.control = value
-
-
-    def set_parameter(self, value):
-        self.parameter = value
+    elif auto_lighting_1=="off" and auto_lighting_2=="on":
+        t3=get_time()-lighting_stop_time3
+        t4=get_time()-lighting_stop_time2
+        t5=get_time()-lighting_stop_time
+        if t3>1750 and t3<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
+        if t4>1750 and t4<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
+        if t5>1750 and t5<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
 

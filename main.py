@@ -14,6 +14,7 @@ app = Flask(__name__)
 node0 = Indoor('node_0')
 outdoor = Outdoor()
 c = Control()
+p=Parameter()
 
 
 def update_indoor():
@@ -71,11 +72,12 @@ def control():
 @app.route('/parameter',methods=['GET','POST'])
 def parameter():
     if request.method == 'POST':
-        save_db_parameter(Parameter)
+        data=request.data
+        a=p.handle_post_parameter(data)
+        save_db_parameter(a)
         return 'save success'
     else:
         return get_db_parameter()
-
 
 @app.route('/hi')
 def change():

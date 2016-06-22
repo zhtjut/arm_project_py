@@ -15,7 +15,6 @@ class Outdoor(object):
         self.__wind_speed = "0"
         self.__rain = "0"
         self.__atmosphere = "0"
-        self.__bad_weather="true"
 
     def get_update_time(self):
         return self.__update_time
@@ -52,11 +51,6 @@ class Outdoor(object):
     def get_atmosphere(self):
         return self.__atmosphere
 
-
-    def get_bad_weather(self):
-        return self.__bad_weather
-
-
     def set_update_time(self, value):
         self.__update_time = value
 
@@ -91,10 +85,6 @@ class Outdoor(object):
 
     def set_atmosphere(self, value):
         self.__atmosphere = value
-
-
-    def set_bad_weather(self, value):
-        self.__bad_weather = value
 
 
 

@@ -1,6 +1,6 @@
 import json
 from currenttime import get_current_time
-from relay_output import tri_state_relay, bi_state_relay
+from relay_output import tri_state_relay_output, bi_state_relay_output
 
 
 class Control(object):
@@ -122,18 +122,18 @@ class Control(object):
             if key in Control.tri_states_actuators:
                 value = obj.get(key)
                 if value in Control.tri_states:
-                    setattr(self, "_Control__" + key, value)  # relay
+                    setattr(self, "_Control__" + key, value)  
                     print key, getattr(self, "_Control__" + key)
-                    tri_state_relay(key,value)
+                    tri_state_relay_output(key,value)
                     json_response += '''"%s" : "%s",''' % (key, value)
                 else:
                     print value, "illegal state"
             elif key in Control.bi_states_actuators:
                 value = obj.get(key)
                 if value in Control.bi_states:
-                    setattr(self, "_Control__" + key, value)  # relay
+                    setattr(self, "_Control__" + key, value)  
                     print key, getattr(self, "_Control__" + key)
-                    bi_state_relay(key,value)
+                    bi_state_relay_output(key,value)
                     json_response += '''"%s" : "%s", ''' % (key, value)
                 else:
                     print value, "illegal state"

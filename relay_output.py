@@ -128,7 +128,7 @@ control_relay={
                 }
 }
 
-def bi_state_relay(key,value):
+def bi_state_relay_output(key,value):
     relay=control_relay.get("bi_state")
     str1=relay.get(key)
     if value=="on":
@@ -140,7 +140,7 @@ def bi_state_relay(key,value):
         print '\n%s relay01 off' %key
         println(out_str)
 
-def tri_state_relay(key,value):
+def tri_state_relay_output(key,value):
     relay=control_relay.get("tri_state")
     str1=relay.get(key)
     if value=="on":
