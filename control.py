@@ -147,31 +147,41 @@ class Control(object):
     def build_json(self):
         return '''
         {
-    "update_time": "2016-06-22 18:52:27",
+    "update_time": "%s",
     "actuator": {
         "tri_state": {
-            "roof_vent_south": "off",
-            "roof_vent_north": "off",
-            "side_vent": "off",
-            "shade_screen_out": "off",
-            "shade_screen_in": "off",
-            "thermal_screen": "off"
+            "roof_vent_south": "%s",
+            "roof_vent_north": "%s",
+            "side_vent": "%s",
+            "shade_screen_out": "%s",
+            "shade_screen_in": "%s",
+            "thermal_screen": "%s"
         },
         "bi_state": {
-            "cooling_pad": "off",
-            "fogging": "off",
-            "heating": "off",
-            "co2": "off",
-            "lighting_1": "off",
-            "lighting_2": "off",
-            "irrigation": "off"
+            "cooling_pad": "%s",
+            "fogging": "%s",
+            "heating": "%s",
+            "co2": "%s",
+            "lighting_1": "%s",
+            "lighting_2": "%s",
+            "irrigation": "%s"
                 }
             }
         }''' \
-               % (get_current_time(),self.get_roof_vent_south(), self.get_roof_vent_north(), self.get_side_vent(),
-                  self.get_shade_screen_out(), self.get_shade_screen_in(),
-                  self.get_thermal_screen(), self.get_cooling_pad(), self.get_fogging(), self.get_heating(),
-                  self.get_co2(), self.get_lighting_1(), self.get_lighting_2(), self.get_irrigation()
+               % (get_current_time(),
+                  self.__roof_vent_south ,
+                    self.__roof_vent_north ,
+                    self.__side_vent ,
+                    self.__shade_screen_out ,
+                    self.__shade_screen_in ,
+                    self.__thermal_screen ,
+                    self.__cooling_pad ,
+                    self.__fogging ,
+                    self.__heating ,
+                    self.__co2 ,
+                    self.__lighting_1 ,
+                    self.__lighting_2 ,
+                    self.__irrigation
                   )
 
     tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent",

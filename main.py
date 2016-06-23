@@ -44,11 +44,14 @@ scheduler1.start()
 scheduler2.start()
 scheduler3.start()
 
+def auto_running():
+    global node0,c,outdoor,p
+    auto_run_main(node0,outdoor,c,p)
+auto=Scheduler(10,auto_running)
 
 @app.route('/')
 def index():
     return '<h1>Hello World!</h1>'
-
 
 @app.route('/indoor')
 def get_indoor():
@@ -62,7 +65,9 @@ def response_outdoor():
 
 @app.route('/control', methods=['GET', 'POST'])
 def manul_control():
-    global control_method
+    global control_method,auto
+    if control_method=="auto":
+        auto.stop()
     control_method="computer_control"
     if request.method == 'POST':
         try:
@@ -75,21 +80,18 @@ def manul_control():
 
 @app.route('/auto')
 def auto_run():
-    global control_method
-    control_method=="auto"
+    global control_method,auto
+    control_method="auto"
     auto.start()
-
-def auto_running():
-    global node0,c,outdoor,p
-    auto_run_main(node0,c,outdoor,p)
-auto=Scheduler(900,auto_run())
+    return 'auto run'
 
 @app.route('/computer')
 def computer_control():
-    global control_method
+    global control_method,auto
     if control_method=="auto":
         auto.stop()
     control_method="computer_control"
+    return 'computer control'
 
 @app.route('/parameter',methods=['GET','POST'])
 def parameter():

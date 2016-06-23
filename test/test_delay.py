@@ -3,32 +3,41 @@
 @author: Zxh
 '''
 from scheduler import Scheduler
-# print "_Control__"+'co2_upper_limit'
-# p=Parameter()
-# print getattr(p,'_Parameter__'+'co2_upper_limit')
-# p.set_shade_screen_out_time("5")
-# wait_and_stop("shade_screen_out",p.get_shade_screen_out_time(),"half")
-# sleep(5)
-# print 'b'
-x=1;
-def test():
-    global x
-    x+=1
-    print x
+from indoor import Indoor
+from outdoor import Outdoor
+from parameter import Parameter
+from control import Control
+from autorun import auto_run_main
 
-def hehe():
-    global x
-    if (x==10):
-        print 'geme over'
-        x=0;
-        print x
-    else:
-        print 'wait'
-s1=Scheduler(2,test)
-s2=Scheduler(1,hehe)
-x=5
-while 1:
-    s1.start()
-    s2.start()
-s1.stop()
-s2.start()   
+onode0=Indoor('node0')
+outdoor=Outdoor()
+p=Parameter()
+c=Control()
+control_method="control"
+
+def auto_running():
+    global node0,c,outdoor,p
+    auto_run_main(node0,outdoor,c,p)
+auto=Scheduler(10,auto_running)
+
+def manul_control():
+    global control_method,auto
+    if control_method=="auto":
+        auto.stop()
+    print 'manul_control'
+    control_method="manul_control"
+    
+def computer_control():
+    global control_method,auto
+    if control_method=="auto":
+        auto.stop()
+    control_method="computer_control"
+    print 'computer control'
+
+def auto_run():
+    global control_method,auto
+    if control_method!="auto":
+        auto.stop()
+    control_method="auto"
+    auto.start()
+    return 'auto run'
