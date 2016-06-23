@@ -2,6 +2,8 @@
 
 @author: Zxh
 '''
+from currenttime import get_time
+from time import sleep
 a="2016-06-15 8:30"
 b="1015"
 print a>b
@@ -14,3 +16,7 @@ print a==0
 a=7
 b="6"
 print a>b
+a=get_time()
+sleep(10)
+b=get_time()
+print b-a

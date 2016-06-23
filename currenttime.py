@@ -18,3 +18,4 @@ def get_time():
 #     print time.localtime(time.time())
 #     print get_current_month()
 #     print get_current_hour()
+#     print get_time()

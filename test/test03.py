@@ -5,6 +5,11 @@
 
 str1="01 01 00 00 61 9C"
 x=''.join(str1.split())
+hehe={"s":-1}
+if hehe.get("s")<0:
+    print hehe.get("s")
+    print abs(hehe.get("s"))
+    
 print x
 print x[0]
 print x[1]

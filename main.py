@@ -8,7 +8,7 @@ from indoor import Indoor
 from scheduler import Scheduler
 from parameter import Parameter
 from database import save_db_indoor, save_db_outdoor, save_db_control,get_db_parameter,save_db_parameter
-from autorun import auto_run_main
+from autorun import auto_run_main,get_side_wait_time
 
 app = Flask(__name__)
 
@@ -23,19 +23,14 @@ def update_indoor():
 #     save_db_indoor(node0)
     print 'indoor updated', get_current_time()
 
-
 def update_outdoor():
     outdoor.get_weather_from_api()
 #     save_db_outdoor(outdoor)
     print 'outdoor updated', get_current_time()
 
-
 def update_control():
 #     save_db_control(c)
     print 'control updated', get_current_time()
-
-def update_parameter():
-    get_db_parameter()
 
 scheduler1 = Scheduler(2000, update_outdoor)
 scheduler2 = Scheduler(3000, update_indoor)
@@ -48,6 +43,8 @@ def auto_running():
     global node0,c,outdoor,p
     auto_run_main(node0,outdoor,c,p)
 auto=Scheduler(10,auto_running)
+
+wait_time=Scheduler(1,get_side_wait_time)
 
 @app.route('/')
 def index():
@@ -82,6 +79,9 @@ def manul_control():
 def auto_run():
     global control_method,auto
     control_method="auto"
+    auto_running()
+    get_side_wait_time()
+    wait_time.start()
     auto.start()
     return 'auto run'
 

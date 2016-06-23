@@ -2,42 +2,14 @@
 
 @author: Zxh
 '''
-from currenttime import get_current_hour, get_current_month,get_time
+from currenttime import get_current_hour, get_current_month,get_time,get_current_time
 
-from relay_output import bi_state_relay_output
-import threading
-from auto_run_relay_output import shade_screen_out_run_and_stop,\
-    roof_run_and_stop, side_vent_run_and_stop, thermal_screen_run_and_stop,side_state, shade_screen_in_run_and_stop
+from relay_output import bi_state_relay_output, tri_state_relay_output
 from time import sleep
 
-temperature_set_temp0=1
-temperature_set_temp1=1
-temperature_set_temp2=1
-side_wait_time=1
-
-lighting_open_time=0
-lighting_open_time2=0
-lighting_stop_time=0
-lighting_stop_time2=0
-lighting_stop_time3=0
-
-roof_state=""
-shade_screen_out_state=""
-shade_screen_in_state=""
-side_vent_state=""
-thermal_screen_state=""
-
-shade_screen_out_time=1
-roof_open_time=1
-side_open_time=1
-thermal_time=1
-shade_screen_in_time=1
-
-angle="zero"
-bad_weather="false"
-
 def auto_run_main(Indoor,Outdoor,Control,Parameter):
-    get_current_control_state(Indoor,Control,Parameter)
+    init_parameter()
+    get_current_control_state(Control)
     co2_control(Indoor,Parameter)
     shade_screen_out_control(Outdoor,Parameter)
     cooling_pad_control(Indoor,Parameter)
@@ -48,57 +20,28 @@ def auto_run_main(Indoor,Outdoor,Control,Parameter):
     heating_control(Indoor,Parameter)
     shade_screen_in_control(Outdoor,Parameter)
     lighting_control(Control,Outdoor,Parameter)
-    
-    
-    maxtime=max(int(Parameter.get_shade_screen_out_time()),int(Parameter.get_roof_vent_open_time())*2,int(Parameter.get_side_vent_time())*1.5,int(Parameter.get_thermal_screen_open_time()),int(Parameter.get_shade_screen_in_time()))
-    
-    t1=threading.Thread(target=shade_screen_in_thread)
-    t2=threading.Thread(target=roof_vent_thread)
-    t3=threading.Thread(target=side_vent_thread)
-    t4=threading.Thread(target=thermal_screen_thread)
-    t5=threading.Thread(target=shade_screen_out_thread)
-    
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
-    sleep(maxtime)
-    
-    
+#indoor temperature humidity, light
 
-def shade_screen_out_thread():
-    global shade_screen_out_state,shade_screen_out_time
-    shade_screen_out_run_and_stop(shade_screen_out_time,shade_screen_out_state)
+def init_parameter():
+    global now_time,temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,side_wait_time,lighting_open_time,lighting_open_time2,lighting_stop_time,lighting_stop_time2,lighting_stop_time3
+    global bad_weather
+    now_time=get_current_time()
+    temperature_set_temp0=0
+    temperature_set_temp1=0
+    temperature_set_temp2=0
+    side_wait_time=0.0
+            
+    lighting_open_time="0"
+    lighting_open_time2="0"
+    lighting_stop_time="0"
+    lighting_stop_time2="0"
+    lighting_stop_time3="0"
+    
+    bad_weather="true"
 
-def roof_vent_thread():
-    global roof_open_time,roof_state
-    roof_run_and_stop(roof_open_time,roof_state)
-
-def side_vent_thread():
-    global side_open_time,side_vent_state
-    side_vent_run_and_stop(side_open_time,side_vent_state)
-
-def thermal_screen_thread():
-    global thermal_time,thermal_screen_state
-    roof_run_and_stop(thermal_time,thermal_screen_state)
-
-def shade_screen_in_thread():
-    global shade_screen_in_time,shade_screen_in_state
-    roof_run_and_stop(shade_screen_in_time,shade_screen_in_state)
-
-def get_side_wait_time():
-    global auto_indoor_temperature,temperature_set_temp2,side_open_time,side_wait_time
-    auto_indoor_temperature
-    if auto_indoor_temperature>(temperature_set_temp2+side_open_time):
-        if side_wait_time<side_open_time:
-            side_wait_time+=1
-            print side_wait_time
-       
-def get_current_control_state(Indoor,Control,Parameter):
+def get_current_control_state(Control):
     global auto_roof_vent_south ,auto_roof_vent_north ,auto_side_vent ,auto_shade_screen_out,auto_shade_screen_in ,auto_thermal_screen,auto_cooling_pad,auto_fogging ,auto_heating,auto_co2
-    global auto_lighting_1,auto_lighting_2,auto_irrigation,shade_screen_out_time,roof_open_time,side_open_time,thermal_time,shade_screen_in_time
-    global auto_indoor_temperature
+    global auto_lighting_1,auto_lighting_2,auto_irrigation
     auto_cooling_pad=Control.get_cooling_pad()
     auto_roof_vent_south =Control.get_roof_vent_south()
     auto_roof_vent_north =Control.get_roof_vent_north()
@@ -110,18 +53,9 @@ def get_current_control_state(Indoor,Control,Parameter):
     auto_fogging = Control.get_fogging()
     auto_heating = Control.get_heating()
     auto_co2 = Control.get_co2()
-    auto_lighting_1 = Control.get_lighting_1()
-    auto_lighting_2 = Control.get_lighting_2()
-    auto_irrigation = Control.get_irrigation()
-    
-    shade_screen_out_time=int(Parameter.get_shade_screen_out_time())
-    roof_open_time=int(Parameter.get_roof_vent_open_time())
-    side_open_time=int(Parameter.get_side_vent_time())
-    thermal_time=int(Parameter.get_thermal_screen_open_time())
-    shade_screen_in_time=int(Parameter.get_shade_screen_in_time())
-    
-    auto_indoor_temperature=Indoor.get_temperature()
-    
+#     auto_lighting_1 = Control.get_lighting_1()
+#     auto_lighting_2 = Control.get_lighting_2()
+#     auto_irrigation = Control.get_irrigation()
     
 def co2_control(Indoor,Parameter):
     global auto_co2
@@ -133,21 +67,26 @@ def co2_control(Indoor,Parameter):
         auto_co2="off"
         
 def shade_screen_out_control(Outdoor,Parameter):
-    global auto_shade_screen_out,shade_screen_out_state
+    global auto_shade_screen_out
     if bad_weather=="true":
         if auto_shade_screen_out=="on":
-            shade_screen_out_state="open to close"
+            tri_state_relay_output("shade_screen_out", "off")
+            wait_and_stop("shade_screen_out",Parameter.get_shade_screen_out_time(),"all")
         auto_shade_screen_out="off"
 #         self.control.set_shade_screen_out("off")
     elif Outdoor.get_radiation()>Parameter.get_upper_limit_light_to_open_shade_screen_out():
         if auto_shade_screen_out=="off":
-            shade_screen_out_state="close to open"
+            tri_state_relay_output("shade_screen_out", "on")
+            wait_and_stop("shade_screen_out",Parameter.get_shade_screen_out_time(),"all")
+#         self.control.set_shade_screen_out("off")
         auto_shade_screen_out="on"
+#         self.control.set_shade_screen_out("on")
     else:
         if auto_shade_screen_out=="on":
-            shade_screen_out_state="open to close"
+            tri_state_relay_output("shade_screen_out", "off")
+            wait_and_stop("shade_screen_out",Parameter.get_shade_screen_out_time(),"all")
         auto_shade_screen_out="off"
-    return shade_screen_out_state
+#         self.control.set_shade_screen_out("off")
 
 def cooling_pad_control(Indoor,Parameter):
     global auto_cooling_pad
@@ -164,30 +103,32 @@ def fogging_control(Indoor,Parameter):
     if float(Indoor.get_temperature())>float(Parameter.get_temperature_to_open_fogging())+1:
         bi_state_relay_output("fogging", "on")
         auto_fogging="on"
+#         Control.set_fogging("on")
+        # if Control.get_thermal_screen()=="on"
+        #    Control.set_thermal_screen("off")
     elif float(Indoor.get_temperature())<float(Parameter.get_temperature_to_open_fogging())-1:
         bi_state_relay_output("fogging", "off")
         auto_fogging="off"
+#             Control.set_fogging("off")
 
 def roof_vent_control(Outdoor,Parameter,Indoor):
-    global temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,angle,auto_roof_vent_north,auto_roof_vent_south,roof_start_time,roof_state
-    current_hour=get_current_hour()
-    roof_start_time=get_time()
+    global temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,angle,auto_roof_vent_north,auto_roof_vent_south
     if bad_weather=="true":
         if auto_roof_vent_north=="on" and auto_roof_vent_south=="on":
-            roof_state="open all to close"
-            if angle=="half":
-                roof_state="open half to close"
-            elif angle=="small":
-                roof_state="open small to close"
+            tri_state_relay_output("roof_vent_south","off")
+            tri_state_relay_output("roof_vent_north","off")
+            wait_and_stop("roof_vent_south",Parameter.get_roof_vent_open_time(),"all")
+            wait_and_stop("roof_vent_north",Parameter.get_roof_vent_open_time(),"all")
         auto_roof_vent_north="off"
         auto_roof_vent_south="off"
-        angle="zero"
+#         self.control.set_roof_vent_north("off")
+#         self.control.set_roof_vent_south("off")
     else:
-        if current_hour >= Parameter.get_time_1() and current_hour < Parameter.get_time_2():
+        if now_time >= Parameter.get_time_1() and now_time < Parameter.get_time_2():
             temperature_set_temp0=float(Parameter.get_temperature_1())
-        elif current_hour >= Parameter.get_time_2() and current_hour < Parameter.get_time_3():
+        elif now_time >= Parameter.get_time_2() and now_time < Parameter.get_time_3():
             temperature_set_temp0=float(Parameter.get_temperature_2())
-        elif current_hour >= Parameter.get_time_3() and current_hour < Parameter.get_time_4():
+        elif now_time >= Parameter.get_time_3() and now_time < Parameter.get_time_4():
             temperature_set_temp0=float(Parameter.get_temperature_3())
         else:
             temperature_set_temp0=float(Parameter.get_temperature_4())  
@@ -224,115 +165,129 @@ def roof_vent_control(Outdoor,Parameter,Indoor):
             
         if Outdoor.get_temperature()<=Parameter.get_frost_temperature():
             if auto_roof_vent_north=="on" and auto_roof_vent_south=="on":
-                roof_state="open all to close"
-                if angle=="half":
-                    roof_state="open half to close"
-                else:
-                    roof_state="open small to close"
+                tri_state_relay_output("roof_vent_south","off")
+                tri_state_relay_output("roof_vent_north","off")
+                wait_and_stop("roof_vent_south",Parameter.get_roof_vent_open_time(),"all")
+                wait_and_stop("roof_vent_north",Parameter.get_roof_vent_open_time(),"all")
             auto_roof_vent_north="off"
             auto_roof_vent_south="off"
-            angle="zero"
+#             Control.set_roof_vent_north("off")
+#             Control.set_roof_vent_south("off")
         elif Outdoor.get_temperature()<=Parameter.get_indoor_temperature_lower_limit():    
             #small angle
             if auto_roof_vent_north=="off" and auto_roof_vent_south=="off":
-                roof_state="close to open small"
-                if angle=="all":
-                    roof_state="open all to open small"
-                elif angle=="half":
-                    roof_state="open half to open small"
+                tri_state_relay_output("roof_vent_south","on")
+                tri_state_relay_output("roof_vent_north","on")
+                wait_and_stop("roof_vent_south",Parameter.get_roof_vent_open_time(),"small")
+                wait_and_stop("roof_vent_north",Parameter.get_roof_vent_open_time(),"small")
             auto_roof_vent_north="on"
             auto_roof_vent_south="on"
             angle="small"
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
         elif Outdoor.get_temperature()<=temperature_set_temp2:
-            #open half
+            #open all
             if auto_roof_vent_north=="off" and auto_roof_vent_south=="off":
-                roof_state="close to open half"
-                if angle=="small":
-                    roof_state="open small to half"
-                elif angle=="all":
-                    roof_state="open all to open half"
-            roof_start_time=get_time()
+                tri_state_relay_output("roof_vent_south","on")
+                tri_state_relay_output("roof_vent_north","on")
+                wait_and_stop("roof_vent_south",Parameter.get_roof_vent_open_time(),"half")
+                wait_and_stop("roof_vent_north",Parameter.get_roof_vent_open_time(),"half")
             auto_roof_vent_north="on"
             auto_roof_vent_south="on" 
             angle="half"
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
         else:
             #  
             if auto_roof_vent_north=="off" and auto_roof_vent_south=="off":
-                roof_state="close to open all"
-                if angle=="small":
-                    roof_state="open half to all"
-                elif angle=="half":
-                    roof_state="open half to open all"
+                tri_state_relay_output("roof_vent_south","on")
+                tri_state_relay_output("roof_vent_north","on")
+                wait_and_stop("roof_vent_south",Parameter.get_roof_vent_open_time(),"all")
+                wait_and_stop("roof_vent_north",Parameter.get_roof_vent_open_time(),"all")
             auto_roof_vent_north="on"
             auto_roof_vent_south="on" 
             angle="all"
-    return roof_state
-         
-            
+#             Control.set_roof_vent_north("on")
+#             Control.set_roof_vent_south("on")
+
+def get_side_wait_time(Indoor,Parameter):
+    if Indoor.get_temperature()>(temperature_set_temp2+Parameter.get_temperature_to_open_side()):
+        if side_wait_time<Parameter.get_wait_time_to_open_side():
+            side_wait_time+=1
+        
 def side_vent_control(Indoor,Parameter):
-    global auto_side_vent,side_wait_time,side_vent_state,side_angle
+    global auto_side_vent,side_wait_time
     if bad_weather=="true":
         if auto_side_vent=="on":
-            side_vent_state="open to close"
+            tri_state_relay_output("side_vent","off")
+            wait_and_stop("side_vent", Parameter.get_side_vent_time(), "all")
         auto_side_vent="off"
-        side_angle="zero"
+#         control.set_side_vent("off")
     elif auto_cooling_pad=="on":
         if auto_side_vent=="off":
-            side_vent_state="close to open all"
+            tri_state_relay_output("side_vent", "on")
+            wait_and_stop("side_vent", Parameter.get_side_vent_time(), "all")
         auto_side_vent="on"
-        side_angle="all"
+#         control.set_side_vent("on")
     elif auto_roof_vent_north=="on" and auto_roof_vent_south=="on":
         if side_wait_time<int(Parameter.get_wait_time_to_open_side()):
+#             control.set_side_vent("off")
             if auto_side_vent=="on":
-                side_vent_state="open to close"
+                tri_state_relay_output("side_vent","off")
+                wait_and_stop("side_vent", Parameter.get_side_vent_time(), "all")
             auto_side_vent="off"
-            side_angle="zero"
         elif side_wait_time>float(Parameter.get_wait_time_to_open_side()) and side_wait_time<2*float(Parameter.get_wait_time_to_open_side()):
             #half open
             if auto_side_vent=="off":
-                side_vent_state="close to open half"
-            elif side_angle=="all":
-                side_vent_state="open all to open half"
+                tri_state_relay_output("side_vent","on")
+                wait_and_stop("side_vent", Parameter.get_side_vent_time(), "half")
             auto_side_vent="on"
-            side_angle="half"
+#             control.set_side_vent("on")
         elif side_wait_time>2*float(Parameter.get_wait_time_to_open_side()):
-            #open all
+            #open
             if auto_side_vent=="off":
-                side_vent_state="close to open all"
-            elif side_angle=="half":
-                side_vent_state="open half to open all"
+                tri_state_relay_output("side_vent","on")
+                wait_and_stop("side_vent", Parameter.get_side_vent_time(), "all")
             auto_side_vent="on"
-            side_angle="all"
+#             control.set_side_vent("on")
         elif Indoor.get_temperature() < (temperature_set_temp2+float(Parameter.get_temperature_to_open_side())):
             if auto_side_vent=="on":
-                side_vent_state="close to open all"
+                tri_state_relay_output("side_vent","off")
+                wait_and_stop("side_vent", Parameter.get_side_vent_time(), "all")
             auto_side_vent="off"
             side_wait_time=0
-            side_angle="zero"
-    return side_vent_state
+#         control.set_side_vent("off")
     
 def thermal_screen_control(Outdoor,Parameter):
-    global auto_thermal_screen,thermal_screen_state
+    global auto_thermal_screen
     if bad_weather=="true":
         if auto_thermal_screen=="on":
-            thermal_screen_state="open to close"
+            tri_state_relay_output("thermal_screen", "off")
+            wait_and_stop("side_vent", Parameter.get_thermal_screen_open_time(), "all")
         auto_thermal_screen="off"
+#         control.set_thermal_screen("off")
     elif auto_fogging=="on":
         if auto_thermal_screen=="on":
-            thermal_screen_state="open to close"
+            tri_state_relay_output("thermal_screen", "off")
+            wait_and_stop("side_vent", Parameter.get_thermal_screen_open_time(), "all")
         auto_thermal_screen="off"
+#         control.set_thermal_screen("off")
     else:
         current_hour=get_current_hour()
         current_month=get_current_month()
         if current_month>Parameter.get_month_to_open_thermal_screen() and current_month<Parameter.get_month_to_close_thermal_screen():
             if current_hour>Parameter.get_time_to_open_thermal_screen() and current_hour<Parameter.get_time_to_close_thermal_screen():
                 if auto_thermal_screen=="off":
-                    thermal_screen_state="close to open"
+                    tri_state_relay_output("thermal_screen", "on")
+                    wait_and_stop("side_vent", Parameter.get_thermal_screen_open_time(), "all")
                 auto_thermal_screen="on"
+#                 control.set_thermal_screen("off")    #open
+        else:
             if auto_thermal_screen=="on":
-                thermal_screen_state="open to close"
+                tri_state_relay_output("thermal_screen", "off")
+                wait_and_stop("side_vent", Parameter.get_thermal_screen_open_time(), "all")
             auto_thermal_screen="off"
-    return thermal_screen_state
+    #             control.set_thermal_screen("on") 
             
 def heating_control(Indoor,Parameter):  #ok
     if Indoor.get_temperature()<Parameter.get_heating_start_lowest_temperature():
@@ -343,79 +298,100 @@ def heating_control(Indoor,Parameter):  #ok
 #         self.control.set_heating("off") 
 
 def shade_screen_in_control(Outdoor,Parameter):
-    global auto_shade_screen_in,shade_screen_in_state
+    global auto_shade_screen_in
     if auto_thermal_screen=="on":
         if auto_shade_screen_in=="off":
-            shade_screen_in_state="close to open"
+            tri_state_relay_output("shade_screen_in","on")
+            wait_and_stop("shade_screen_in", Parameter.get_shade_screen_in_time(), "all")
         auto_shade_screen_in="on"
+#         self.control.set_shade_screen_in("on")
     elif Outdoor.get_radiation()>Parameter.get_upper_limit_light_to_open_shade_screen_in():
+#         self.control.set_shade_screen_in("off")
         if auto_shade_screen_in=="on":
-            shade_screen_in_state="open to close"
+            tri_state_relay_output("shade_screen_in","off")
+            wait_and_stop("shade_screen_in", Parameter.get_shade_screen_in_time(), "all")
         auto_shade_screen_in="off"
     else:
         if auto_shade_screen_in=="off":
-            shade_screen_in_state="close to open"
+            tri_state_relay_output("shade_screen_in","on")
+            wait_and_stop("shade_screen_in", Parameter.get_shade_screen_in_time(), "all")
         auto_shade_screen_in="on"
-    return shade_screen_in_state    
+#         self.control.set_shade_screen_in("on")
         
 def lighting_control(Control,Outdoor,Parameter):
-    global t1,t2,t3,t4,t5,lighting_stop_time,lighting_stop_time2,lighting_stop_time3,lighting_open_time,lighting_open_time2
-    month=int(get_current_month())
-    hour=int(get_current_hour())
-
+    global lighting_stop_time,lighting_stop_time2,lighting_stop_time3
+    auto_lighting_1 = Control.get_lighting_1()
+    auto_lighting_2 = Control.get_lighting_2()
     if auto_lighting_1=="off" and auto_lighting_2=="off":
-        if month>Parameter.get_month_to_open_lighting() and month<Parameter.get_month_to_close_lighting():
-            if hour>Parameter.get_period_1_start_lighting() and hour<Parameter.get_period_1_stop_lighting():
+        if get_current_month()>Parameter.get_month_to_open_lighting() and get_current_month()<Parameter.get_month_to_close_lighting():
+            if get_current_time()>Parameter.get_period_1_start_lighting() and get_current_time()<Parameter.get_period_1_stop_lighting():
                 if Outdoor.get_radiation()<Parameter.get_radiation_1_to_open_lighting():
-                    Control.set_lighting_1("on")
+#                         Control.set_lighting_1("on")
                     bi_state_relay_output("lighting_1", "on")
+                    auto_lighting_1="on"
                     lighting_open_time=get_time()
-            elif hour>Parameter.get_period_2_start_lighting() and hour<Parameter.get_period_2_stop_lighting():
+            elif get_current_time()>Parameter.get_period_2_start_lighting() and get_current_time()<Parameter.get_period_2_stop_lighting():
                 if Outdoor.get_radiation()<Parameter.get_radiation_2_to_open_lighting():
-                    Control.set_lighting_1("on")
+#                         Control.set_lighting_1("on")
                     bi_state_relay_output("lighting_2", "on")
+                    auto_lighting_2="on"
                     lighting_open_time2=get_time()
 
     elif auto_lighting_1=="on" and auto_lighting_2=="off":
-        t1=float(get_time()-lighting_open_time)
-        t2=float(get_time()-lighting_open_time2)
-        if t1>30 and t1<60:
-            bi_state_relay_output("lighting_2", "on")
-            #auto_lighting_2="on"
-            Control.set_lighting_2("on")
-        if t2>30 and t2<60:
-            Control.set_lighting_2("on")
-            bi_state_relay_output("lighting_2", "on")
-            #auto_lighting_2="on"
+        t1=int(get_time()-lighting_open_time)
+        t2=int(get_time()-lighting_open_time2)
+        if t1>1750 and t1<1850:
+            bi_state_relay_output("ligting_2", "on")
+            auto_lighting_2="on"
+#                 Control.set_lighting_2("on")
+        if t2>1750 and t2<1850:
+#                 Control.set_lighting_2("on")
+            bi_state_relay_output("ligting_2", "on")    
+            auto_lighting_2="on"
     elif auto_lighting_1=="on" and auto_lighting_2=="on":
-        if hour>Parameter.get_period_1_start_lighting() and hour<Parameter.get_period_1_stop_lighting():
+        if get_current_time()>Parameter.get_period_1_start_lighting() and get_current_time()<Parameter.get_period_1_stop_lighting():
             if Outdoor.get_radiation()>Parameter.get_radiation_1_to_open_lighting():
-                Control.set_lighting_1("off")
-                bi_state_relay_output("lighting_1", "off")
-                #auto_lighting_1="off"
+#                     Control.set_lighting_1("off")
+                bi_state_relay_output("ligting_1", "off")  
+                auto_lighting_1="off"
                 lighting_stop_time=get_time()
-        elif hour>Parameter.get_period_2_start_lighting() and hour<Parameter.get_period_2_stop_lighting():
+        elif get_current_time()>Parameter.get_period_2_start_lighting() and get_current_time()<Parameter.get_period_2_stop_lighting():
             if Outdoor.get_radiation()>Parameter.get_radiation_2_to_open_lighting():
-                Control.set_lighting_1("off")
-                bi_state_relay_output("lighting_1", "off")
-                #auto_lighting_1="off"
+#                     Control.set_lighting_1("off")
+                bi_state_relay_output("ligting_1", "off")
+                auto_lighting_1="off"  
                 lighting_stop_time2=get_time()
         else:
-            Control.set_lighting_1("off")
-            bi_state_relay_output("lighting_1", "off")
-            #auto_lighting_1="off"
+#                 Control.set_lighting_1("off")
+            bi_state_relay_output("ligting_1", "off")
+            auto_lighting_1="off"  
             lighting_stop_time3=get_time()
 
     elif auto_lighting_1=="off" and auto_lighting_2=="on":
         t3=get_time()-lighting_stop_time3
         t4=get_time()-lighting_stop_time2
         t5=get_time()-lighting_stop_time
-        if t3>30 and t3<60:
-            bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
-        if t4>30 and t4<60:
-            bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
-        if t5>30 and t5<60:
-            bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
+        if t3>1750 and t3<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
+        if t4>1750 and t4<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
+        if t5>1750 and t5<1850:
+            bi_state_relay_output("ligting_2", "off")
+#                 Control.set_lighting_2("off")
+    else:
+        bi_state_relay_output("ligting_2", "off")
+        bi_state_relay_output("ligting_1", "off")
+
+def wait_and_stop(key,time,open_all):
+    time=int(time)
+    if open_all=="all":
+        sleep(time)
+    elif open_all=="half":
+        sleep(time/2)
+    elif open_all=="small":
+        sleep(time/4)
+    else:
+        sleep(2)
+    tri_state_relay_output(key, "stop")
