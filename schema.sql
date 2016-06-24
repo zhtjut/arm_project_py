@@ -100,12 +100,12 @@ create table parameter(
     
     temperature_to_open_side text not null,
     wait_time_to_open_side text not null,
-    rain_upper_limit_to_close text not null,
+    rain_upper_limit_to_close text not null,   #
     
-    upper_limit_light_to_open_shade_screen_out text not null,
-    upper_limit_light_to_open_shade_screen_in text not null,
+    upper_limit_light_to_open_shade_screen_out text not null,  #
+    upper_limit_light_to_open_shade_screen_in text not null,   #
     soil_humidity_to_start_irrigation text not null,
-    soil_humidity_to_stop_irrigation text not null,
+    soil_humidity_to_stop_irrigation text not null,    #
     temperature_to_open_fogging text not null,
     temperature_to_open_cooling_pad text not null,
     
@@ -119,8 +119,8 @@ create table parameter(
 	radiation2_to_open_lighting text not null,
 	
 	roof_vent_open_time text not null,
-	side_vent_open_time text not null,
-	shade_screen_out_open_time text not null,
-	shade_screen_in_open_time text not null,
+	side_vent_open_time text not null,   #
+	shade_screen_out_open_time text not null,    #
+	shade_screen_in_open_time text not null,     #
 	thermal_screen_open_time text not null
 	)

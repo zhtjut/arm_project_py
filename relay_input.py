@@ -19,6 +19,7 @@ def get_control_state(str1,Control):
 #     print 'ralay_number:'+relay_bin
     get_relay_state(relay_number[7],relay_bin,Control)
     print Control.build_json()
+    return Control.build_json()
 
 def get_all_state():
     out_str=Query_all

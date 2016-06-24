@@ -95,13 +95,19 @@ def computer_control():
 
 @app.route('/parameter',methods=['GET','POST'])
 def parameter():
-    if request.method == 'POST':
+    global p
+    if request.method == 'GET':
+        if p.update_time=="":
+            return get_db_parameter(p)
+        else:
+            return p.build_to_json()
+
+    else:
         data=request.data
+#         print data
         a=p.handle_post_parameter(data)
         save_db_parameter(a)
         return 'save success'
-    else:
-        return get_db_parameter()
 
 if __name__ == '__main__':
     app.run('0.0.0.0', '8020')

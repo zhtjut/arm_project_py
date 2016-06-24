@@ -36,6 +36,35 @@ shade_screen_in_time=1
 angle="zero"
 bad_weather="false"
 
+def init():
+    global temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,side_wait_time,lighting_open_time,lighting_open_time2,lighting_stop_time,angle,bad_weather
+    global lighting_stop_time2,lighting_stop_time3,roof_state,shade_screen_out_state,shade_screen_in_state,side_vent_state,thermal_screen_state,shade_screen_out_time,roof_open_time,side_open_time,thermal_time,shade_screen_in_time
+    temperature_set_temp0=1
+    temperature_set_temp1=1
+    temperature_set_temp2=1
+    side_wait_time=1
+    
+    lighting_open_time=0
+    lighting_open_time2=0
+    lighting_stop_time=0
+    lighting_stop_time2=0
+    lighting_stop_time3=0
+    
+    roof_state=""
+    shade_screen_out_state=""
+    shade_screen_in_state=""
+    side_vent_state=""
+    thermal_screen_state=""
+    
+    shade_screen_out_time=1
+    roof_open_time=1
+    side_open_time=1
+    thermal_time=1
+    shade_screen_in_time=1
+    
+    angle="zero"
+    bad_weather="false"
+
 def auto_run_main(Indoor,Outdoor,Control,Parameter):
     get_current_control_state(Indoor,Control,Parameter)
     co2_control(Indoor,Parameter)

@@ -7,6 +7,10 @@
 def println(value):
     print value
  
+def get_current_relay_state(Query):
+    
+    result="get"+Query
+    return result
 # serialport = serial.Serial("com3",9600,timeout=1)
 # def init_serial(com):
 #     serialport = serial.Serial("%s",9600,timeout=1 %(com))
