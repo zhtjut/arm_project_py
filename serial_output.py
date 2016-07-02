@@ -13,6 +13,7 @@ def println(value):
 def serial_output_commands(command):
     print command
 
+
 def get_current_relay_state(Query):
     result = "get" + Query
     return result
