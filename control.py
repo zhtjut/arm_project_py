@@ -24,57 +24,42 @@ class Control(object):
     def set_roof_vent_south(self, value):
         self.__roof_vent_south = value
 
-
     def set_roof_vent_north(self, value):
         self.__roof_vent_north = value
-
 
     def set_side_vent(self, value):
         self.__side_vent = value
 
-
     def set_shade_screen_out(self, value):
         self.__shade_screen_out = value
-
 
     def set_shade_screen_in(self, value):
         self.__shade_screen_in = value
 
-
     def set_thermal_screen(self, value):
         self.__thermal_screen = value
-
 
     def set_cooling_pad(self, value):
         self.__cooling_pad = value
 
-
     def set_fogging(self, value):
         self.__fogging = value
-
 
     def set_heating(self, value):
         self.__heating = value
 
-
     def set_co_2(self, value):
         self.__co2 = value
-
 
     def set_lighting_1(self, value):
         self.__lighting_1 = value
 
-
     def set_lighting_2(self, value):
         self.__lighting_2 = value
-
 
     def set_irrigation(self, value):
         self.__irrigation = value
 
-    
-    
-    
     def get_roof_vent_south(self):
         return self.__roof_vent_south
 
@@ -122,18 +107,18 @@ class Control(object):
             if key in Control.tri_states_actuators:
                 value = obj.get(key)
                 if value in Control.tri_states:
-                    setattr(self, "_Control__" + key, value)  
+                    setattr(self, "_Control__" + key, value)
                     print key, getattr(self, "_Control__" + key)
-                    tri_state_relay_output(key,value)
+                    tri_state_relay_output(key, value)
                     json_response += '''"%s" : "%s",''' % (key, value)
                 else:
                     print value, "illegal state"
             elif key in Control.bi_states_actuators:
                 value = obj.get(key)
                 if value in Control.bi_states:
-                    setattr(self, "_Control__" + key, value)  
+                    setattr(self, "_Control__" + key, value)
                     print key, getattr(self, "_Control__" + key)
-                    bi_state_relay_output(key,value)
+                    bi_state_relay_output(key, value)
                     json_response += '''"%s" : "%s", ''' % (key, value)
                 else:
                     print value, "illegal state"
@@ -169,19 +154,19 @@ class Control(object):
             }
         }''' \
                % (get_current_time(),
-                  self.__roof_vent_south ,
-                    self.__roof_vent_north ,
-                    self.__side_vent ,
-                    self.__shade_screen_out ,
-                    self.__shade_screen_in ,
-                    self.__thermal_screen ,
-                    self.__cooling_pad ,
-                    self.__fogging ,
-                    self.__heating ,
-                    self.__co2 ,
-                    self.__lighting_1 ,
-                    self.__lighting_2 ,
-                    self.__irrigation
+                  self.__roof_vent_south,
+                  self.__roof_vent_north,
+                  self.__side_vent,
+                  self.__shade_screen_out,
+                  self.__shade_screen_in,
+                  self.__thermal_screen,
+                  self.__cooling_pad,
+                  self.__fogging,
+                  self.__heating,
+                  self.__co2,
+                  self.__lighting_1,
+                  self.__lighting_2,
+                  self.__irrigation
                   )
 
     tri_states_actuators = ("roof_vent_south", "roof_vent_north", "side_vent",
@@ -192,4 +177,3 @@ class Control(object):
     tri_states = ("on", "off", "stop")
 
     bi_states = ("on", "off")
-    
