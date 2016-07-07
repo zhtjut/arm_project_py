@@ -39,25 +39,6 @@ create table if not exists 'control_state'(
 	irrigation text not null
 );
 
---create table if not exists 'plant_parameter_setting'(
---	id integer primary key autoincrement,
---	time1 text not null,
---    temperature1 text not null,
---    time2 text not null,
---    temperature2 text not null,
---    time3 text not null,
---    temperature3 text not null,
---    time4 text not null,
---    temperature4 text not null,
---    co2_upper_limit text not null,
---    co2_lower_limit text not null
---);
---
---create table if not exists 'co2_parameter_setting'(
---	id integer primary key autoincrement,
---	co2_upper_limit text not null,
---    co2_lower_limit text not null
---);
 drop table if exists parameter;
 create table parameter(
 	id integer primary key autoincrement,

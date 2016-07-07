@@ -6,7 +6,6 @@ from flask import Flask, g
 import sqlite3
 import os
 from currenttime import get_current_time
-from parameter import Parameter
 
 app = Flask(__name__)
 

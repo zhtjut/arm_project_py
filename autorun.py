@@ -7,7 +7,7 @@ from currenttime import get_current_hour, get_current_month, get_time
 from relay_output import bi_state_relay_output
 import threading
 from auto_run_relay_output import shade_screen_out_run_and_stop, \
-    roof_run_and_stop, side_vent_run_and_stop, thermal_screen_run_and_stop, side_state, shade_screen_in_run_and_stop
+    roof_run_and_stop, side_vent_run_and_stop
 from time import sleep
 
 temperature_set_temp0 = 1
@@ -36,36 +36,36 @@ shade_screen_in_time = 1
 angle = "zero"
 bad_weather = "false"
 
-
-def init():
-    global temperature_set_temp0, temperature_set_temp1, temperature_set_temp2, side_wait_time, lighting_open_time, lighting_open_time2, lighting_stop_time, angle, bad_weather
-    global lighting_stop_time2, lighting_stop_time3, roof_state, shade_screen_out_state, shade_screen_in_state, side_vent_state, thermal_screen_state, shade_screen_out_time, roof_open_time, side_open_time, thermal_time, shade_screen_in_time
+def init_pram():
+    global shade_screen_out_time, roof_open_time, side_open_time, thermal_time, shade_screen_in_time,thermal_screen_state
+    global temperature_set_temp0,temperature_set_temp1,temperature_set_temp2,side_wait_time,lighting_open_time,lighting_open_time2
+    global lighting_stop_time,lighting_stop_time2,lighting_stop_time3,roof_state,shade_screen_out_state,side_vent_state,shade_screen_in_state
+    global angle,bad_weather
     temperature_set_temp0 = 1
     temperature_set_temp1 = 1
     temperature_set_temp2 = 1
     side_wait_time = 1
-
+    
     lighting_open_time = 0
     lighting_open_time2 = 0
     lighting_stop_time = 0
     lighting_stop_time2 = 0
     lighting_stop_time3 = 0
-
+    
     roof_state = ""
     shade_screen_out_state = ""
     shade_screen_in_state = ""
     side_vent_state = ""
     thermal_screen_state = ""
-
+    
     shade_screen_out_time = 1
     roof_open_time = 1
     side_open_time = 1
     thermal_time = 1
     shade_screen_in_time = 1
-
+    
     angle = "zero"
     bad_weather = "false"
-
 
 def auto_run_main(Indoor, Outdoor, Control, Parameter):
     global shade_screen_out_time, roof_open_time, side_open_time, thermal_time, shade_screen_in_time
@@ -95,6 +95,7 @@ def auto_run_main(Indoor, Outdoor, Control, Parameter):
     t4.start()
     t5.start()
     sleep(maxtime)
+    sleep(2)
 
 
 def shade_screen_out_thread():
