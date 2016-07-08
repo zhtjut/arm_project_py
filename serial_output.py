@@ -2,33 +2,29 @@
 
 @author: Zxh
 '''
-
-
-# import serial
+import serial
+from time import sleep
+import binascii
 
 def println(value):
     print value
 
+serialport = serial.Serial("com3",9600,timeout=2)
 
-def serial_output_commands(command):
-    print command
+def send_command(data):
+    data=bytes(bytearray.fromhex(data))
+    serialport.write(data)
+#     print time.time()
+    while serialport.inWaiting()==0:
+        pass
+    print 'do it'
+    recv=serialport.readline()
+    recv=binascii.b2a_hex(recv)
+    return recv
+    sleep(0.05)
+    
 
-
-def get_current_relay_state(Query):
-    result = "get" + Query
-    return result
-    # serialport = serial.Serial("com3",9600,timeout=1)
-    # def init_serial(com):
-    #     serialport = serial.Serial("%s",9600,timeout=1 %(com))
-
-    # def send_data(data):
-    #     data=bytes.fromhex(data)
-    #     serialport.write(data)
-    #     print(data)
-    #     receive=serialport.readall()
-    #     print(receive)
-    #
-    # init_serial('com1')
-    # data="FE 05 00 05 00 00 C9 C4"
-    # while True:
-    #     send_data(data)
+def query_all_state(Query):
+    recv=send_command(Query)
+    return recv
+    

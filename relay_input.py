@@ -2,37 +2,39 @@
 2016/06/20
 @author: Zxh
 '''
-from serial_output import println
+from serial_output import query_all_state
 from control import Control
 
-Query_all = "FE 01 00 00 00 08 29 C3"
-Query_all_return = "01 01 00 00 61 9C"
+first_query_all = "0101000000083DCC"
+second_query_all = "0201000000083DCC"
+third_query_all = "0301000000083DCC"
+query_all=[first_query_all,second_query_all,third_query_all]
 co = Control()
 
-
-def get_control_state(str1, Control):
+def get_current_relay_state(Control):
     #     print control.build_json()
-    return_message = delete_blank(str1)
-    relay_number = string_to_bin(return_message[0:2])
-    relay_state = return_message[4:6]
-    relay_bin = string_to_bin(relay_state)
+    #     return_message = delete_blank(str1)
+    current_state=get_all_state()
+    for message in current_state:
+        relay_number = string_to_bin(message[0:2])
+        relay_state = message[4:6]
+        relay_bin = string_to_bin(relay_state)
     #     print 'relay_state:'+relay_number
     #     print 'ralay_number:'+relay_bin
-    get_relay_state(relay_number[7], relay_bin, Control)
+        get_relay_state(relay_number[7], relay_bin, Control)
     print Control.build_json()
     return Control.build_json()
 
-
 def get_all_state():
-    out_str = Query_all
-    println(out_str)
-    return Query_all_return
+    current_state=[]
+    for query in query_all:
+        recv=query_all_state(query)
+        current_state.append(recv)
+    return current_state
 
-
-def delete_blank(str1):
-    x = str1.split()
-    return ''.join(x)
-
+# def delete_blank(str1):
+#     x = str1.split()
+#     return ''.join(x)
 
 def get_relay_state(relay_number, relay_state, Control):
     if relay_number == '1':
@@ -134,7 +136,6 @@ def get_relay_state(relay_number, relay_state, Control):
             Control.set_irrigation("off")
     else:
         print 'relay_nymber error'
-
 
 def string_to_bin(str_in):
     a = '{0:b}'.format(int(str_in, 16))
