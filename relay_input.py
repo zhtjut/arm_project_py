@@ -5,23 +5,23 @@
 from serial_output import query_all_state
 from control import Control
 
-first_query_all = "0101000000083DCC"
-second_query_all = "0201000000083DCC"
-third_query_all = "0301000000083DCC"
+first_query_all = "01 01 00 00 00 08 3D CC"
+second_query_all = "02 01 00 00 00 08 3D FF"
+third_query_all = "03 01 00 00 00 08 3C 2E"
 query_all=[first_query_all,second_query_all,third_query_all]
 co = Control()
 
 def get_current_relay_state(Control):
-    #     print control.build_json()
-    #     return_message = delete_blank(str1)
     current_state=get_all_state()
     for message in current_state:
-        relay_number = string_to_bin(message[0:2])
-        relay_state = message[4:6]
-        relay_bin = string_to_bin(relay_state)
-    #     print 'relay_state:'+relay_number
-    #     print 'ralay_number:'+relay_bin
-        get_relay_state(relay_number[7], relay_bin, Control)
+        if message !='':
+            print message
+            relay_number = int(message[0:2])
+            relay_state = message[6:8]
+            relay_bin = string_to_bin(relay_state)
+            get_relay_state(relay_number, relay_bin, Control)
+        else:
+            print 'nothing return'
     print Control.build_json()
     return Control.build_json()
 
@@ -139,8 +139,8 @@ def get_relay_state(relay_number, relay_state, Control):
 
 def string_to_bin(str_in):
     a = '{0:b}'.format(int(str_in, 16))
+    str2 = ''
     if len(str(a)) < 7:
-        str2 = ''
         for i in range(8 - len(str(a))):
             str2 += '0'
     return str2 + str(a)
@@ -148,3 +148,14 @@ def string_to_bin(str_in):
 # str2="EF"
 # print '{0:b}'.format(int(str2,16))
 # get_control_state(Query_all_return,co)
+# current_state=get_all_state()
+# for message in current_state:
+#     if message !='':
+#         print message
+#         relay_number = int(message[0:2])
+#         relay_state = message[6:8]
+#         relay_bin = string_to_bin(relay_state)
+#         print 'relay_number:',relay_number
+#         print 'relay_state:'+relay_bin
+#     else:
+#         print 'nothing return'

@@ -2,7 +2,5 @@
 
 @author: Zxh
 '''
-from test.test10 import get_value, change_calue
-get_value()
-change_calue(11)
-get_value()
+print int('ff',16)
+print '{0:b}'.format(int('ff', 16))
