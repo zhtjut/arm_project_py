@@ -18,7 +18,7 @@ outdoor = Outdoor()
 c = Control()
 p = Parameter()
 get_db_parameter(p)  # init parameter from database
-control_method = "auto"
+control_method = "computer"
 
 
 def update_indoor():

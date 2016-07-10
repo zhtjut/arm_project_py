@@ -128,8 +128,8 @@ class Outdoor(object):
         update_time = get_current_time()
         temperature = str(wea_json['now']['tmp'])
         humidity = str(wea_json['now']['hum'])
-        radiation = 'not included'
-        co2 = 'not included'
+        radiation = '300'
+        co2 = '600'
         wind_direction = wea_json['now']['wind']['dir']
         wind_speed = str(wea_json['now']['wind']['spd'])
         rain = wea_json['now']['pcpn']

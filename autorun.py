@@ -82,21 +82,24 @@ def auto_run_main(Indoor, Outdoor, Control, Parameter):
     lighting_control(Control, Outdoor, Parameter)
 
     maxtime = max(shade_screen_out_time, roof_open_time * 2, side_open_time * 1.5, thermal_time, shade_screen_in_time)
-
+    mutex=threading.Lock()
+    threads=[]
     t1 = threading.Thread(target=shade_screen_in_thread)
     t2 = threading.Thread(target=roof_vent_thread)
     t3 = threading.Thread(target=side_vent_thread)
     t4 = threading.Thread(target=thermal_screen_thread)
     t5 = threading.Thread(target=shade_screen_out_thread)
-
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
+    threads.append(t1)
+    threads.append(t2)
+    threads.append(t3)
+    threads.append(t4)
+    threads.append(t5)
+    for t in threads:
+        t.setDaemon(False)
+        t.start()
     sleep(maxtime)
     sleep(2)
-
+    print 'game over'
 
 def shade_screen_out_thread():
     global shade_screen_out_state, shade_screen_out_time
@@ -125,7 +128,6 @@ def shade_screen_in_thread():
 
 def get_side_wait_time():
     global auto_indoor_temperature, temperature_set_temp2, side_open_time, side_wait_time
-    auto_indoor_temperature
     if auto_indoor_temperature > (temperature_set_temp2 + side_open_time):
         if side_wait_time < side_open_time:
             side_wait_time += 1
