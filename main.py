@@ -52,7 +52,6 @@ def auto_running():
 
 
 auto = Scheduler(10, auto_running)
-
 wait_time = Scheduler(1, get_side_wait_time)
 
 
@@ -116,9 +115,6 @@ def computer_control():
 def parameter():
     global p
     if request.method == 'GET':
-        #         if p.update_time=="":
-        #             return get_db_parameter(p)
-        #         else:
         return p.build_to_json()
     else:
         data = request.data

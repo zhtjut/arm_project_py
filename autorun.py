@@ -9,6 +9,10 @@ import threading
 from auto_run_relay_output import shade_screen_out_run_and_stop, \
     roof_run_and_stop, side_vent_run_and_stop
 from time import sleep
+from control import Control
+from database import save_db_control
+
+temp=Control()
 
 temperature_set_temp0 = 1
 temperature_set_temp1 = 1
@@ -52,11 +56,11 @@ def init_pram():
     lighting_stop_time2 = 0
     lighting_stop_time3 = 0
     
-    roof_state = ""
-    shade_screen_out_state = ""
-    shade_screen_in_state = ""
-    side_vent_state = ""
-    thermal_screen_state = ""
+    roof_state = "open all to close"
+    shade_screen_out_state = "open to close"
+    shade_screen_in_state = "open to close"
+    side_vent_state = "open to close"
+    thermal_screen_state = "open to close"
     
     shade_screen_out_time = 1
     roof_open_time = 1
@@ -79,10 +83,11 @@ def auto_run_main(Indoor, Outdoor, Control, Parameter):
     thermal_screen_control(Outdoor, Parameter)
     heating_control(Indoor, Parameter)
     shade_screen_in_control(Outdoor, Parameter)
-    lighting_control(Control, Outdoor, Parameter)
+    lighting_control(Outdoor, Parameter)
+    
+    get_current_state_to_save
 
     maxtime = max(shade_screen_out_time, roof_open_time * 2, side_open_time * 1.5, thermal_time, shade_screen_in_time)
-    mutex=threading.Lock()
     threads=[]
     t1 = threading.Thread(target=shade_screen_in_thread)
     t2 = threading.Thread(target=roof_vent_thread)
@@ -95,7 +100,7 @@ def auto_run_main(Indoor, Outdoor, Control, Parameter):
     threads.append(t4)
     threads.append(t5)
     for t in threads:
-        t.setDaemon(False)
+#         t.setDaemon(False)
         t.start()
     sleep(maxtime)
     sleep(2)
@@ -386,19 +391,18 @@ def thermal_screen_control(Outdoor, Parameter):
                 auto_thermal_screen = "on"
             if auto_thermal_screen == "on":
                 thermal_screen_state = "open to close"
-            auto_thermal_screen = "off"
+        auto_thermal_screen = "off"
     return thermal_screen_state
 
 
 def heating_control(Indoor, Parameter):  # ok
     if Indoor.get_temperature() < Parameter.get_heating_start_lowest_temperature():
         bi_state_relay_output("heating", "on")
-    # self.control.set_heating("on")
+        auto_heating="on"
     elif Indoor.get_temperature() > Parameter.get_heating_stop_highest_temperature():
         bi_state_relay_output("heating", "on")
+        auto_heating="off"
 
-
-# self.control.set_heating("off")
 
 def shade_screen_in_control(Outdoor, Parameter):
     global auto_shade_screen_in, shade_screen_in_state
@@ -406,7 +410,7 @@ def shade_screen_in_control(Outdoor, Parameter):
         if auto_shade_screen_in == "off":
             shade_screen_in_state = "close to open"
         auto_shade_screen_in = "on"
-    elif Outdoor.get_radiation() > Parameter.get_upper_limit_light_to_open_shade_screen_in():
+    elif Outdoor.get_radiation() > Parameter.get_upper_limit_light_to_open_in_shade_screen():
         if auto_shade_screen_in == "on":
             shade_screen_in_state = "open to close"
         auto_shade_screen_in = "off"
@@ -417,7 +421,7 @@ def shade_screen_in_control(Outdoor, Parameter):
     return shade_screen_in_state
 
 
-def lighting_control(Control, Outdoor, Parameter):
+def lighting_control(Outdoor, Parameter):
     global t1, t2, t3, t4, t5, lighting_stop_time, lighting_stop_time2, lighting_stop_time3, lighting_open_time, lighting_open_time2
     month = int(get_current_month())
     hour = int(get_current_hour())
@@ -426,13 +430,13 @@ def lighting_control(Control, Outdoor, Parameter):
         if month > Parameter.get_month_to_open_lighting() and month < Parameter.get_month_to_close_lighting():
             if hour > Parameter.get_period_1_start_lighting() and hour < Parameter.get_period_1_stop_lighting():
                 if Outdoor.get_radiation() < Parameter.get_radiation_1_to_open_lighting():
-                    Control.set_lighting_1("on")
                     bi_state_relay_output("lighting_1", "on")
+                    auto_lighting_1="on"
                     lighting_open_time = get_time()
             elif hour > Parameter.get_period_2_start_lighting() and hour < Parameter.get_period_2_stop_lighting():
                 if Outdoor.get_radiation() < Parameter.get_radiation_2_to_open_lighting():
-                    Control.set_lighting_1("on")
                     bi_state_relay_output("lighting_2", "on")
+                    auto_lighting_2="on"
                     lighting_open_time2 = get_time()
 
     elif auto_lighting_1 == "on" and auto_lighting_2 == "off":
@@ -440,29 +444,24 @@ def lighting_control(Control, Outdoor, Parameter):
         t2 = float(get_time() - lighting_open_time2)
         if t1 > 30 and t1 < 60:
             bi_state_relay_output("lighting_2", "on")
-            # auto_lighting_2="on"
-            Control.set_lighting_2("on")
+            auto_lighting_2="on"
         if t2 > 30 and t2 < 60:
-            Control.set_lighting_2("on")
             bi_state_relay_output("lighting_2", "on")
-            # auto_lighting_2="on"
+            auto_lighting_2="on"
     elif auto_lighting_1 == "on" and auto_lighting_2 == "on":
         if hour > Parameter.get_period_1_start_lighting() and hour < Parameter.get_period_1_stop_lighting():
             if Outdoor.get_radiation() > Parameter.get_radiation_1_to_open_lighting():
-                Control.set_lighting_1("off")
                 bi_state_relay_output("lighting_1", "off")
-                # auto_lighting_1="off"
+                auto_lighting_1="off"
                 lighting_stop_time = get_time()
         elif hour > Parameter.get_period_2_start_lighting() and hour < Parameter.get_period_2_stop_lighting():
             if Outdoor.get_radiation() > Parameter.get_radiation_2_to_open_lighting():
-                Control.set_lighting_1("off")
                 bi_state_relay_output("lighting_1", "off")
-                # auto_lighting_1="off"
+                auto_lighting_1="off"
                 lighting_stop_time2 = get_time()
         else:
-            Control.set_lighting_1("off")
             bi_state_relay_output("lighting_1", "off")
-            # auto_lighting_1="off"
+            auto_lighting_1="off"
             lighting_stop_time3 = get_time()
 
     elif auto_lighting_1 == "off" and auto_lighting_2 == "on":
@@ -471,10 +470,31 @@ def lighting_control(Control, Outdoor, Parameter):
         t5 = get_time() - lighting_stop_time
         if t3 > 30 and t3 < 60:
             bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
+            auto_lighting_2="off"
         if t4 > 30 and t4 < 60:
             bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
+            auto_lighting_2="off"
         if t5 > 30 and t5 < 60:
             bi_state_relay_output("lighting_2", "off")
-            Control.set_lighting_2("off")
+            auto_lighting_2="off"
+
+def get_current_state_to_save():
+    global temp
+    global auto_roof_vent_south, auto_roof_vent_north, auto_side_vent, auto_shade_screen_out, auto_shade_screen_in, auto_thermal_screen, auto_cooling_pad, auto_fogging, auto_heating, auto_co2
+    global auto_lighting_1, auto_lighting_2, auto_irrigation
+    
+    temp.set_cooling_pad(auto_cooling_pad)
+    temp.set_roof_vent_south(auto_roof_vent_south)
+    temp.set_roof_vent_north(auto_roof_vent_north)
+    temp.set_side_vent(auto_side_vent)
+    temp.set_shade_screen_out(auto_shade_screen_out)
+    temp.set_shade_screen_in(auto_shade_screen_in)
+    temp.set_thermal_screen(auto_thermal_screen)
+    temp.set_cooling_pad(auto_cooling_pad)
+    temp.set_fogging(auto_fogging)
+    temp.set_heating(auto_heating)
+    temp.set_co2(auto_co2)
+    temp.set_lighting_1(auto_lighting_1)
+    temp.set_lighting_2(auto_lighting_2)
+    temp.set_irrigation(auto_irrigation)
+    save_db_control(temp)

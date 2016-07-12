@@ -3,13 +3,13 @@
 @author: Zxh
 '''
 from serial_output import query_all_state
-from control import Control
+# from control import Control
 
 first_query_all = "01 01 00 00 00 08 3D CC"
 second_query_all = "02 01 00 00 00 08 3D FF"
 third_query_all = "03 01 00 00 00 08 3C 2E"
 query_all=[first_query_all,second_query_all,third_query_all]
-co = Control()
+# co = Control()
 
 def get_current_relay_state(Control):
     current_state=get_all_state()

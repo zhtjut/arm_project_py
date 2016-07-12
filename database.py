@@ -212,23 +212,20 @@ def query_db(query, args=(), one=False):
 
 
 
-        # if __name__ == '__main__':
-        #     p=Parameter()
-        #     init_db()
-
-        #     p=Parameter()
-        #     save_db_parameter(p)
-        #     query='select * from parameter where id=(select max(id) from parameter)'
-        #     print query_db(query)
-        #     get_db_parameter()
-
-        #     print p.get_co2_lower_limit()
-
-        #      out=Outdoor()
-        #      with app.app_context():
-        #          db=get_db()
-        #          db.execute('''insert into outdoor(update_time,temperature,humidity,radiation,co2,wind_direction,wind_speed,rain_snow,atmosphere)\
-        #                         values(?,?,?,?,?,?,?,?,?)''', [out.update_time,out.temperature,out.humidity,out.radiation,out.co2,out.wind_direction,\
-        #                                                      out.wind_speed,out.rain,out.atmosphere])
-        #          db.commit()
-        #      print(out.classtoJson())
+# if __name__ == '__main__':
+#     p=Parameter()
+#     init_db()
+#     p=Parameter()
+#     save_db_parameter(p)
+#     query='select * from parameter where id=(select max(id) from parameter)'
+#     print query_db(query)
+#     get_db_parameter()
+#     print p.get_co2_lower_limit()
+#      out=Outdoor()
+#      with app.app_context():
+#          db=get_db()
+#          db.execute('''insert into outdoor(update_time,temperature,humidity,radiation,co2,wind_direction,wind_speed,rain_snow,atmosphere)\
+#                         values(?,?,?,?,?,?,?,?,?)''', [out.update_time,out.temperature,out.humidity,out.radiation,out.co2,out.wind_direction,\
+#                                                      out.wind_speed,out.rain,out.atmosphere])
+#          db.commit()
+#      print(out.classtoJson())

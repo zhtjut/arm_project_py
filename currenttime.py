@@ -18,10 +18,11 @@ def get_current_hour():
 
 def get_time():
     return time.time()
-    # if __name__ == '__main__':
-    #     print get_current_time()
-    #     print time.time()
-    #     print time.localtime(time.time())
-    #     print get_current_month()
-    #     print get_current_hour()
-    #     print get_time()
+
+if __name__ == '__main__':
+    print get_current_time()
+    print time.time()
+    print time.localtime(time.time())
+    print get_current_month()
+    print get_current_hour()
+    print get_time()

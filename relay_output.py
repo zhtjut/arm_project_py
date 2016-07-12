@@ -139,38 +139,35 @@ def bi_state_relay_output(key, value):
     str1 = relay.get(key)
     if value == "on":
         out_str = str1[1]
-        # print '\n%s relay on : ' % key
-        send_command(out_str)
     else:
         out_str = str1[0]
-        # print '\n%s relay off : ' % key
-        send_command(out_str)
-    print key+': '+value
+    send_command(out_str)
+    print '\n%s relay off ' % key
 
 def tri_state_relay_output(key, value):
     relay = control_relay.get("tri_state")
     str1 = relay.get(key)
     if value == "on":
         out_str = str1.get("on")[1]
-        # print '\n%s relay01 on : ' % key
         send_command(out_str)
+        print '\n%s relay01 on ' % key
         out_str = str1.get("off")[0]
-        # print '%s relay02 off : ' % key
         send_command(out_str)
+        print '%s relay02 off ' % key
     elif value == "off":
         out_str = str1.get("on")[0]
-        # print '\n%s relay01 off ' % key
         send_command(out_str)
+        print '\n%s relay01 off ' % key
         out_str = str1.get("off")[1]
-        # print '%s relay02 on : ' % key
         send_command(out_str)
+        print '%s relay02 on ' % key
     else:
         out_str = str1.get("off")[0]
-        # print '\n%s relay01 off : ' % key
         send_command(out_str)
+        print '\n%s relay01 off ' % key
         out_str = str1.get("on")[0]
-        # print '%s relay02 off : ' % key
         send_command(out_str)
+        print '%s relay02 off ' % key
     print key+': '+value
 # test
 # str="lighting_2"

@@ -2,27 +2,34 @@
 
 @author: Zxh
 '''
-import serial
+# import serial
 from time import sleep
 import binascii
 import threading
 a=1
-serialport = serial.Serial("com6",9600,timeout=2)
+# try:
+#     serialport = serial.Serial("com6",9600,timeout=2)
+# except:
+#     print 'serial error: there is no COM or COM was occupied'
+
 mutex=threading.Lock()
 def send_command(data):
     global mutex,a
-    data=bytes(bytearray.fromhex(data))
+#     data=bytes(bytearray.fromhex(data))
     if mutex.acquire():
-        serialport.write(data)
-        while serialport.inWaiting()>0:
-            pass
-        print 'output correct  '+str(a)
-        recv=serialport.readline()
-        recv=binascii.b2a_hex(recv)
+        sleep(2)
+#         serialport.write(data)
+#         while serialport.inWaiting()>0:
+#             pass
+#         print 'output correct  '+str(a)
+#         recv=serialport.readline()
+#         recv=binascii.b2a_hex(recv)
+#         a=a+1
         a=a+1
+        print 'output correct  '+str(a)
         mutex.release()
     sleep(0.03)
-    return recv
+#     return recv
 
 def query_all_state(Query):
     recv=send_command(Query)

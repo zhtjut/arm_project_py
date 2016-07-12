@@ -3,6 +3,7 @@ import json
 import urllib
 from currenttime import get_current_time
 
+url = 'https://api.heweather.com/x3/weather?city=jiading&key=8924d0a789dd4e348982cfe7f721267c'
 
 class Outdoor(object):
     def __init__(self):
@@ -11,9 +12,9 @@ class Outdoor(object):
         self.__humidity = "5"
         self.__radiation = "300"
         self.__co2 = "600"
-        self.__wind_direction = "no wind"
-        self.__wind_speed = "0"
-        self.__rain = "0"
+        self.__wind_direction = "6"
+        self.__wind_speed = "3"
+        self.__rain = "1"
         self.__atmosphere = "0"
 
     def get_update_time(self):
@@ -121,8 +122,10 @@ class Outdoor(object):
                   self.__wind_speed, self.__rain, self.__atmosphere, self.__update_time)
 
     def get_weather_from_api(self):
-        url = 'https://api.heweather.com/x3/weather?city=jiading&key=8924d0a789dd4e348982cfe7f721267c'
-        data = urllib.urlopen(url).read()
+        try:
+            data = urllib.urlopen(url).read()
+        except:
+            print 'Internet error'
         wea_json = json.loads(data)
         wea_json = wea_json['HeWeather data service 3.0'][0]
         update_time = get_current_time()
@@ -140,7 +143,9 @@ class Outdoor(object):
         atmosphere = str(wea_json['now']['pres'])
         self.set_outdoor(update_time, temperature, humidity, radiation, co2, wind_direction, wind_speed, rain,
                          atmosphere)
-#         test
-# a=Outdoor()
-# a.get_weather_from_api()
-# print(a.build_json())
+
+if __name__=='__main__':
+    print 'test'
+    a=Outdoor()
+    a.get_weather_from_api()
+    print(a.build_json())
