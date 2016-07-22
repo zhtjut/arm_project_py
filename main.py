@@ -124,7 +124,7 @@ def parameter():
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', '8020')
+    app.run('0.0.0.0', '8010')
     scheduler1.stop()
     scheduler2.stop()
     scheduler3.stop()
