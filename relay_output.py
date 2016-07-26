@@ -4,7 +4,7 @@
 '''
 from serial_output import send_command
 
-first_1st_on = "01 05 00 00 FF 00 8C 3A"
+first_1st_on = "01 05 00 00 FF 00 8C 3A"   
 first_1st_off = "01 05 00 00 00 00 CD CA"
 first_2nd_on = "01 05 00 01 FF 00 DD FA"
 first_2nd_off = "01 05 00 01 00 00 9C 0A"

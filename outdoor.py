@@ -148,4 +148,5 @@ if __name__=='__main__':
     print 'test'
     a=Outdoor()
     a.get_weather_from_api()
-    print(a.build_json())
+    print a.build_json()
+    print a.get_wind_speed()
