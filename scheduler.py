@@ -25,9 +25,10 @@ class Scheduler(object):
             del self._t
 
 
-            # test
+# test
+
 # def update_indoor():
-#     print 'indoor updated'
+# print 'indoor updated'
 #
 #
 # def update_outdoor():

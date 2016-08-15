@@ -1,130 +1,117 @@
 # coding=utf-8
 
 from currenttime import get_current_time
-from flask import Flask, request
+from flask import Flask, request,Response
 from outdoor import Outdoor
 from control import Control
-from indoor import Indoor
 from scheduler import Scheduler
-from parameter import Parameter
-from database import save_db_indoor, save_db_outdoor, save_db_control, get_db_parameter, save_db_parameter
-from autorun import auto_run_main, get_side_wait_time
-import json
+from indoor import Indoor
+from control_command import ControlCommand
+
+from database import get_db_indoor, get_db_outdoor, get_db_control_state, save_db_control_state, save_db_indoor, \
+    save_db_outdoor, \
+    get_db_control_command, save_db_control_command
+
 
 app = Flask(__name__)
 
-node0 = Indoor('node_0')
+node_num = 10
 outdoor = Outdoor()
-c = Control()
-p = Parameter()
-get_db_parameter(p)  # init parameter from database
-control_method = "computer"
+control = Control()
+indoor = Indoor()
+command = ControlCommand()
+indoor_all_state = ''
 
+# get_db_indoor(node0)
+# get_db_outdoor(outdoor)
+# get_db_control(c)
 
 def update_indoor():
-    #     save_db_indoor(node0)
-    print 'indoor updated', get_current_time()
+    global indoor_all_state
+    number = node_num
+    get_db_indoor(indoor)
+    indoor_all_state = '''{''' + indoor.build_json_array()
+    for i in range(number - 1):
+        temp = Indoor(str(i + 2))
+        indoor_all_state += ','
+        get_db_indoor(temp)
+        indoor_all_state += temp.build_json_array()
+    indoor_all_state += '''}'''
+    print 'indoor update', get_current_time()
 
 
 def update_outdoor():
-    outdoor.get_weather_from_api()
-    #     save_db_outdoor(outdoor)
+    get_db_outdoor(outdoor)
     print 'outdoor updated', get_current_time()
 
 
 def update_control():
-    #     save_db_control(c)
+    get_db_control_state(control)
     print 'control updated', get_current_time()
 
 
-scheduler1 = Scheduler(2000, update_outdoor)
-scheduler2 = Scheduler(3000, update_indoor)
-scheduler3 = Scheduler(5000, update_control)
-update_outdoor()  # init outdoor from internet
-scheduler1.start()
-scheduler2.start()
-scheduler3.start()
-
-
-def auto_running():
-    global node0, c, outdoor, p
-    auto_run_main(node0, outdoor, c, p)
-
-
-auto = Scheduler(10, auto_running)
-wait_time = Scheduler(1, get_side_wait_time)
-
-
-@app.route('/')
-def index():
-    return '<h1>Hello World!</h1>'
+update_indoor()
+update_outdoor()
+update_control()
+# scheduler1 = Scheduler(10, update_outdoor)
+# scheduler2 = Scheduler(10, update_indoor)
+# scheduler3 = Scheduler(10, update_control)
+# scheduler1.start()
+# scheduler2.start()
+# scheduler3.start()
 
 
 @app.route('/indoor')
-def get_indoor():
-    return node0.build_json()
+def indoor_response():
+    update_indoor()
+    rsp = Response(indoor_all_state)
+    rsp.headers['Access-Control-Allow-Origin'] = '*'
+    return rsp
 
 
 @app.route('/outdoor')
-def response_outdoor():
-    return outdoor.build_json()
+def outdoor_response():
+    update_outdoor()
+    rsp = Response(outdoor.build_json())
+    rsp.headers['Access-Control-Allow-Origin'] = '*'
+    return rsp
 
 
-@app.route('/control', methods=['GET', 'POST'])
-def control():
+@app.route('/control', methods=['GET', 'POST' , 'OPTIONS'])
+def control_response():
     if request.method == 'POST':
         try:
             data = request.data
-            return c.handle_post(data)
+            rsp = Response(control.handle_post(data))
+            save_db_control_state(control)
+            command.handle_post(data)
+            save_db_control_command(command)
+            rsp.headers["Content-Type"] = ["text/html; charset=UTF-8"]
+            rsp.headers['Access-Control-Allow-Origin'] = '*'
+            rsp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+            rsp.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type'
+            return rsp
         except ValueError:
             return "get currently control state success"
-    else:
-        return c.build_json()
-
-
-@app.route('/auto', methods=['GET', 'POST'])
-def auto_run():
-    global control_method
-    if request.method == 'POST':
-        data = request.data
-        obj = json.loads(data)
-        model = obj['model']
-        if model == 'auto':
-            if control_method != 'auto':
-                auto_running()
-                get_side_wait_time()
-                wait_time.start()
-                auto.start()
-        else:
-            if control_method == 'auto':
-                auto.stop()
-                wait_time.stop()
-        control_method = model
-        return model
-    else:
-        return 'get request null'
-
-
-@app.route('/computer')
-def computer_control():
-    global control_method, auto
-    return 'computer control'
-
-
-@app.route('/parameter', methods=['GET', 'POST'])
-def parameter():
-    global p
     if request.method == 'GET':
-        return p.build_to_json()
+        update_control()
+        rsp = Response(control.build_json())
+        rsp.headers["Content-Type"] = ["text/html; charset=UTF-8"]
+        rsp.headers['Access-Control-Allow-Origin'] = '*'
+        rsp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+        rsp.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type'
+        return rsp
     else:
-        data = request.data
-        p.handle_post_parameter(data)
-        save_db_parameter(p)
-        return 'save success'
+        rsp = Response("")
+        rsp.headers["Content-Type"] = ["text/html; charset=UTF-8"]
+        rsp.headers['Access-Control-Allow-Origin'] = '*'
+        rsp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+        rsp.headers['Access-Control-Allow-Headers'] = 'X-Requested-With, Content-Type'
+        return rsp
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', '8020')
-    scheduler1.stop()
-    scheduler2.stop()
-    scheduler3.stop()
+    app.run('0.0.0.0', 8020)
+    # scheduler1.stop()
+    # scheduler2.stop()
+    # scheduler3.stop()

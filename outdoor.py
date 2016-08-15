@@ -5,7 +5,22 @@ from currenttime import get_current_time
 
 url = 'https://api.heweather.com/x3/weather?city=jiading&key=8924d0a789dd4e348982cfe7f721267c'
 
+
 class Outdoor(object):
+    wind_direction_data={
+        "1":"东风",
+        "2":"南风",
+        "3":"西风",
+        "4":"北风",
+        "12":"东南风",
+        "14":"东北风",
+        "23":"西南风",
+        "34":"西北风"
+    }
+
+    def get_db_wind_direction(self, value):
+        return self.wind_direction_data.get(value)
+
     def __init__(self):
         self.__update_time = "just now"
         self.__temperature = "10"
@@ -88,7 +103,6 @@ class Outdoor(object):
         self.__atmosphere = value
 
 
-
     def set_outdoor(self, update_time1, temperature1, humidity1, radiation1, co21, wind_direction1, wind_speed1,
                     rain1, atmosphere1):
         self.__update_time = update_time1
@@ -100,9 +114,8 @@ class Outdoor(object):
         self.__wind_speed = wind_speed1
         self.__rain = rain1
         self.__atmosphere = atmosphere1
-    
-    
-    
+
+
     def build_json(self):
         return '''
         {
@@ -144,9 +157,10 @@ class Outdoor(object):
         self.set_outdoor(update_time, temperature, humidity, radiation, co2, wind_direction, wind_speed, rain,
                          atmosphere)
 
-if __name__=='__main__':
+
+if __name__ == '__main__':
     print 'test'
-    a=Outdoor()
+    a = Outdoor()
     a.get_weather_from_api()
     print a.build_json()
     print a.get_wind_speed()
